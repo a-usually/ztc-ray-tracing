@@ -5,7 +5,7 @@
 ![GitHub top language](https://img.shields.io/github/languages/top/Danny2003/John-Raytracing-2023)
 ![License](https://img.shields.io/github/license/Danny2003/John-Raytracing-2023)
 ![GitHub repo size](https://img.shields.io/github/repo-size/Danny2003/John-Raytracing-2023)
-![GitHub Workflow Status](https://github.com/Danny2003/John-Raytracing-2023/actions/workflows/cargo.yml/badge.svg)
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/Danny2003/John-Raytracing-2023/cargo.yml?branch=master)
 
 ## 课程介绍
 
