@@ -155,7 +155,7 @@
 
 ### Makefile
 
-[`Makefile`](https://github.com/Danny2003/John-Raytracing-2023/blob/main/Makefile/) 中包含了运行 raytracer 的常用指令。如果没有安装 `make`，你也可以直接运行 `cargo balahbalah`。
+[`Makefile`](https://github.com/Danny2003/John-Raytracing-2023/blob/master/Makefile/) 中包含了运行 raytracer 的常用指令。如果没有安装 `make`，你也可以直接运行 `cargo balahbalah`。
 
 * `make fmt` 会自动格式化所有的 Rust 代码
 * `make clippy` 会对代码风格做进一步约束
