@@ -68,7 +68,7 @@ impl Material for Metal {
         attenuation: &mut Vec3,
         scattered: &mut Ray,
     ) -> bool {
-        let reflected = Vec3::reflect(&r_in.direc().unit().clone(), &rec.normal.clone());
+        let reflected = Vec3::reflect(&r_in.direc().unit().clone(), &rec.normal.unit().clone());
 
         *scattered = Ray::new(
             rec.point3.clone(),
@@ -76,8 +76,8 @@ impl Material for Metal {
         );
         *attenuation = self.albedo.clone();
 
-        //(scattered.direc() * rec.normal.clone()) > 0.0
         true
+        //(scattered.direc() * rec.normal.clone()) > 0.0
     }
 }
 

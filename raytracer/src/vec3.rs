@@ -118,7 +118,7 @@ impl Vec3 {
     }
 
     pub fn reflect(v: &Vec3, n: &Vec3) -> Vec3 {
-        v.clone() - Vec3::elemul(&(Vec3::elemul(&v, &n)), &n) * 2.0
+        v.clone() - n.clone()*(n.clone()*v.clone()) * 2.0
     }
 
     pub fn refract(uv: &Vec3, n: &Vec3, etai_over_etat: f64) -> Vec3 {
