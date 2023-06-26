@@ -26,7 +26,7 @@ impl Hiitable for Sphere {
         let oc = r.ori() - self.center.clone();
         let a = r.direc().squared_length();
         let half_b = oc.clone() * r.direc();
-        let c = oc.clone().squared_length() - self.radius.clone() * self.radius.clone();
+        let c = oc.squared_length() - self.radius * self.radius;
         let discriminant = half_b * half_b - a * c;
         if discriminant < 0.0 {
             return false;
@@ -49,6 +49,6 @@ impl Hiitable for Sphere {
         rec.set_front_size(r, &outward_normal);
         rec.mat = self.mat.clone();
 
-        return true;
+        true
     }
 }

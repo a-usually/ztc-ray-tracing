@@ -6,9 +6,9 @@ pub struct Ray {
 }
 
 impl Ray {
-    // pub fn info(&self) {
-    //     println!("ray{}", self.direc.x());
-    // }
+    pub fn info(&self) {
+        println!("ray{}", self.direc.x());
+    }
 
     pub fn new(origin: Vec3, direction: Vec3) -> Ray {
         Ray {
@@ -27,11 +27,5 @@ impl Ray {
 
     pub fn direc(&self) -> Vec3 {
         self.direc.clone()
-    }
-    pub fn info(&self){
-        println!("ori");
-        self.ori.info();
-        println!("dir");
-        self.direc.info();
     }
 }

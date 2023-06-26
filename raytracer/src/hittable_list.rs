@@ -1,4 +1,5 @@
 use crate::hiitable::{Hiitable, HitRecord};
+
 use crate::ray::Ray;
 use std::sync::Arc;
 
@@ -7,11 +8,11 @@ pub struct HittableList {
     objects: Vec<Option<Arc<dyn Hiitable>>>,
 }
 
-//impl Default for Hittable_list {
-//  fn default() -> Self {
-//    Self::new();
-// }
-//}
+impl Default for HittableList {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
 impl HittableList {
     pub fn new() -> Self {

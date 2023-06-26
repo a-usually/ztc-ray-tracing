@@ -37,13 +37,13 @@ impl Material for Lambertian {
         }
         *scattered = Ray::new(rec.point3.clone(), scatter_direction);
         *attenuation = self.albedo.clone();
-        return true;
+        true
     }
 }
 
 //metal
 pub struct Metal {
-    pub albedo: Vec3,
+    albedo: Vec3,
     fuzz: f64,
 }
 
@@ -68,7 +68,7 @@ impl Material for Metal {
         attenuation: &mut Vec3,
         scattered: &mut Ray,
     ) -> bool {
-        let reflected = Vec3::reflect(&r_in.direc().unit().clone(), &rec.normal.unit().clone());
+        let reflected = Vec3::reflect(&r_in.direc().unit(), &rec.normal.clone());
 
         *scattered = Ray::new(
             rec.point3.clone(),
@@ -76,8 +76,7 @@ impl Material for Metal {
         );
         *attenuation = self.albedo.clone();
 
-        true
-        //(scattered.direc() * rec.normal.clone()) > 0.0
+        (scattered.direc() * rec.normal.clone()) > 0.0
     }
 }
 
@@ -117,8 +116,7 @@ impl Material for Dielectric {
 
         let unit_direction = r_in.direc.unit();
 
-        let cos_theta = 
-        if ((-unit_direction.clone()) * rec.normal.clone()) < 1.0 {
+        let cos_theta: f64 = if ((-unit_direction.clone()) * rec.normal.clone()) < 1.0 {
             (-unit_direction.clone()) * rec.normal.clone()
         } else {
             1.0
@@ -126,11 +124,12 @@ impl Material for Dielectric {
         let sin_theta = (1.0 - cos_theta * cos_theta).sqrt();
 
         let cannot_refract: bool = (refraction_ratio * sin_theta) > 1.0;
-        let direction;
-        if cannot_refract || Dielectric::reflectance(cos_theta, refraction_ratio) > random_f64() {
-            direction = Vec3::reflect(&unit_direction, &rec.normal)
+        let direction = if cannot_refract
+            || Dielectric::reflectance(cos_theta, refraction_ratio) > random_f64()
+        {
+            Vec3::reflect(&unit_direction, &rec.normal)
         } else {
-            direction = Vec3::refract(&unit_direction, &rec.normal, refraction_ratio)
+            Vec3::refract(&unit_direction, &rec.normal, refraction_ratio)
         };
 
         *scattered = Ray::new(rec.point3.clone(), direction);
