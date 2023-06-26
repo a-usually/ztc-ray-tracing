@@ -9,7 +9,7 @@ mod rtweekend;
 mod vec3;
 
 pub use camera::Camera;
-use color::{color, write_color};
+use color::{ write_color};
 pub use hiitable::Hiitable;
 pub use hittable_list::HittableList;
 use image::{ImageBuffer, RgbImage};
@@ -34,17 +34,30 @@ fn ray_color(r: &Ray, world: &mut HittableList, depth: i32) -> Vec3 {
         return Vec3::new(0.0, 0.0, 0.0);
     }
     if world.hit(r, 0.001, INFINITY, &mut rec) {
+        // println!("depth={}",depth);
+        // r.info();
+        // println!("------------------");
         let mut scattered: Ray = Ray::new(Vec3::new(0.0, 0.0, 0.0), Vec3::new(0.0, 0.0, 0.0));
         let mut attenuation: Vec3 = Vec3::new(0.0, 0.0, 0.0);
-        if rec
+        rec
             .mat
             .clone()
             .unwrap()
-            .scatter(r, &mut rec, &mut attenuation, &mut scattered)
-        {
+            .scatter(r, &mut rec, &mut attenuation, &mut scattered);
+
             return Vec3::elemul(&attenuation, &ray_color(&scattered, world, depth - 1));
-        }
-        return Vec3::new(0.0, 0.0, 0.0);
+
+        // let unit_direction = r.direc.unit();
+        // let t = 0.5 * (unit_direction.y() + 1.0);
+
+        // let tmp1 = Vec3::new(1.0, 1.0, 1.0);
+        // let tmp2 = Vec3::new(0.5, 0.7, 1.0);
+
+        // let x1 = tmp1.x as f64 * (1.0 - t) + (tmp2.x as f64) * t;
+        // let y1 = tmp1.y as f64 * (1.0 - t) + (tmp2.y as f64) * t;
+        // let z1 = tmp1.z as f64 * (1.0 - t) + (tmp2.z as f64) * t;
+        // //println!("tmp={}{}{}", tmp[0], tmp[1], tmp[2]);
+        // return Vec3::elemul(&Vec3::new(x1, y1, z1),& attenuation);
     } else {
         let unit_direction = r.direc.unit();
         let t = 0.5 * (unit_direction.y() + 1.0);
@@ -62,7 +75,7 @@ fn ray_color(r: &Ray, world: &mut HittableList, depth: i32) -> Vec3 {
 
 fn random_scene() -> HittableList {
     let mut world = HittableList::new();
-
+/*
     let ground_material: Option<Arc<dyn Material>> =
         Some(Arc::new(Lambertian::new(&Vec3::new(0.5, 0.5, 0.5))));
     world.add(Some(Arc::new(Sphere::new(
@@ -70,7 +83,6 @@ fn random_scene() -> HittableList {
         1000.0,
         ground_material,
     ))));
-
     for a in -11..11 {
         for b in -11..11 {
             let choose_mat = random_f64();
@@ -88,13 +100,13 @@ fn random_scene() -> HittableList {
                     sphere_material = Some(Arc::new(Lambertian::new(&albedo)));
                     world.add(Some(Arc::new(Sphere::new(&center, 0.2, sphere_material))));
                 }
-                // else if choose_mat < 0.95 {
-                //     //metal
-                //     let albedo = Vec3::random_vec3_2(0.5, 1.0);
-                //     let fuzz = random_f64_1(0.0, 0.5);
-                //     sphere_material = Some(Arc::new(Metal::new(&albedo, fuzz)));
-                //     world.add(Some(Arc::new(Sphere::new(&center, 0.2, sphere_material))));
-                // }
+                 else if choose_mat < 0.95 {
+                     //metal
+                     let albedo = Vec3::random_vec3_2(0.5, 1.0);
+                     let fuzz = random_f64_1(0.0, 0.5);
+                     sphere_material = Some(Arc::new(Metal::new(&albedo, fuzz)));
+                     world.add(Some(Arc::new(Sphere::new(&center, 0.2, sphere_material))));
+                }
                 else {
                     //glass
                     sphere_material = Some(Arc::new(Dielectric::new(1.5)));
@@ -103,7 +115,6 @@ fn random_scene() -> HittableList {
             }
         }
     }
-
     let material1: Option<Arc<dyn Material>> = Some(Arc::new(Dielectric::new(1.5)));
     world.add(Some(Arc::new(Sphere::new(
         &Vec3::new(0.0, 1.0, 0.0),
@@ -118,7 +129,7 @@ fn random_scene() -> HittableList {
         1.0,
         material2,
     ))));
-
+*/
     let material3: Option<Arc<dyn Material>> =
         Some(Arc::new(Metal::new(&Vec3::new(0.7, 0.6, 0.5), 0.0)));
     world.add(Some(Arc::new(Sphere::new(
@@ -145,7 +156,7 @@ fn main() {
     let width = 400;
     let path = "output/test.jpg";
     let quality = 60; // From 0 to 100, suggested value: 60
-    let samples_per_pixel = 20;
+    let samples_per_pixel = 4;
     let max_depth = 30;
 
     // Create image data
@@ -192,6 +203,15 @@ fn main() {
         dist_to_focus,
     );
 
+    // let i = 0;
+    // let j = 0;
+    // let u = ((i as f64) + random_f64()) / (width as f64 - 1.0);
+    // let v = ((j as f64) + random_f64()) / (height as f64 - 1.0);
+
+    // let r = cam.get_ray(u, v);
+    // let tmp = ray_color(&r, &mut world, max_depth); //[0-1]
+    // tmp.info();//76 96 128 4c6080
+    // return;
     //image
     for j in 0..height {
         for i in 0..width {
@@ -207,6 +227,13 @@ fn main() {
 
                 //ray_1.info();
             }
+            // if(
+            //     pixel_color.x <10.0&&
+            //     pixel_color.y <10.0&&
+            //     pixel_color.z <10.0
+            // ){
+            //     println!("{},{}",i,j);
+            // }
             //pixel_color.info();
             write_color(&pixel_color, &mut img, i, height - j - 1, samples_per_pixel); //[0-255*sample]
             bar.inc(1);

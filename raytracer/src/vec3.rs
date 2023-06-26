@@ -65,7 +65,7 @@ impl Vec3 {
     }
 
     pub fn random_vec3_1() -> Vec3 {
-        return Vec3::new((random_f64()), (random_f64()), (random_f64()));
+        return Vec3::new(random_f64(), random_f64(), random_f64());
     }
 
     pub fn random_vec3_2(min: f64, max: f64) -> Vec3 {
@@ -109,12 +109,12 @@ impl Vec3 {
 
     pub fn near_zero(&self) -> bool {
         let s: f64 = 1e-8;
-        return (self.x < s)
+        (self.x < s)
             && (self.x > -s)
             && (self.y < s)
             && (self.y > -s)
             && (self.z < s)
-            && (self.z > -s);
+            && (self.z > -s)
     }
 
     pub fn reflect(v: &Vec3, n: &Vec3) -> Vec3 {
@@ -129,18 +129,18 @@ impl Vec3 {
             cos_theta = 1.0;
         }
         let r_out_perp = (uv.clone() + n.clone() * cos_theta) * etai_over_etat;
-        let mut r_out_parallel = Vec3::new(0.0, 0.0, 0.0);
+        let r_out_parallel;
         if 1.0 > r_out_perp.squared_length() {
             r_out_parallel = n.clone() * (-(1.0 - r_out_perp.squared_length()).sqrt());
         } else {
             r_out_parallel = n.clone() * (-(r_out_perp.squared_length() - 1.0).sqrt());
         };
-        return r_out_perp + r_out_parallel;
+        r_out_perp + r_out_parallel
     }
 
-    //    pub fn info(&self){
-    //     println!("x:{},y:{},z:{}",self.x,self.y,self.z);
-    //    }
+       pub fn info(&self){
+        println!("x:{},y:{},z:{}",self.x,self.y,self.z);
+       }
 }
 
 impl Add for Vec3 {

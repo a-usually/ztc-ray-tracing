@@ -1,5 +1,4 @@
 use crate::hiitable::{Hiitable, HitRecord};
-use crate::object::Sphere;
 use crate::ray::Ray;
 use std::sync::Arc;
 
@@ -37,7 +36,7 @@ impl HittableList {
                 *rec = temp_rec.clone();
             }
         }
-        return hit_anything;
+        hit_anything
     }
     pub fn add(&mut self, object: Option<Arc<dyn Hiitable>>) {
         self.objects.push(object);
