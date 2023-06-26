@@ -65,15 +65,15 @@ impl Vec3 {
     }
 
     pub fn random_vec3_1() -> Vec3 {
-        return Vec3::new((random_f64()), (random_f64()), (random_f64()));
+        Vec3::new(random_f64(), random_f64(), random_f64())
     }
 
     pub fn random_vec3_2(min: f64, max: f64) -> Vec3 {
-        return Vec3::new(
+        Vec3::new(
             random_f64_1(min, max),
             random_f64_1(min, max),
             random_f64_1(min, max),
-        );
+        )
     }
     pub fn random_in_unit_sphere() -> Vec3 {
         loop {
@@ -109,33 +109,31 @@ impl Vec3 {
 
     pub fn near_zero(&self) -> bool {
         let s: f64 = 1e-8;
-        return (self.x < s)
+        (self.x < s)
             && (self.x > -s)
             && (self.y < s)
             && (self.y > -s)
             && (self.z < s)
-            && (self.z > -s);
+            && (self.z > -s)
     }
 
     pub fn reflect(v: &Vec3, n: &Vec3) -> Vec3 {
-        v.clone() - Vec3::elemul(&(Vec3::elemul(&v, &n)), &n) * 2.0
+        v.clone() - n.clone() * (v.clone() * n.clone()) * 2.0
     }
 
     pub fn refract(uv: &Vec3, n: &Vec3, etai_over_etat: f64) -> Vec3 {
-        let cos_theta: f64;
-        if ((-uv.clone()) * n.clone()) < 1.0 {
-            cos_theta = (-uv.clone()) * n.clone();
+        let cos_theta: f64 = if ((-uv.clone()) * n.clone()) < 1.0 {
+            (-uv.clone()) * n.clone()
         } else {
-            cos_theta = 1.0;
-        }
-        let r_out_perp = (uv.clone() + n.clone() * cos_theta) * etai_over_etat;
-        let mut r_out_parallel = Vec3::new(0.0, 0.0, 0.0);
-        if 1.0 > r_out_perp.squared_length() {
-            r_out_parallel = n.clone() * (-(1.0 - r_out_perp.squared_length()).sqrt());
-        } else {
-            r_out_parallel = n.clone() * (-(r_out_perp.squared_length() - 1.0).sqrt());
+            1.0
         };
-        return r_out_perp + r_out_parallel;
+        let r_out_perp = (uv.clone() + n.clone() * cos_theta) * etai_over_etat;
+        let r_out_parallel = if 1.0 > r_out_perp.squared_length() {
+            n.clone() * (-(1.0 - r_out_perp.squared_length()).sqrt())
+        } else {
+            n.clone() * (-(r_out_perp.squared_length() - 1.0).sqrt())
+        };
+        r_out_perp + r_out_parallel
     }
 
     //    pub fn info(&self){

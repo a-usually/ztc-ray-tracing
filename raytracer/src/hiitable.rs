@@ -12,6 +12,12 @@ pub struct HitRecord {
     pub mat: Option<Arc<dyn Material>>,
 }
 
+impl Default for HitRecord {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl HitRecord {
     pub fn new() -> Self {
         Self {
@@ -24,7 +30,7 @@ impl HitRecord {
     }
     pub fn set_front_size(&mut self, r: &Ray, outward_normal: &Vec3) {
         self.front_size = r.direc() * outward_normal.clone() < 0.0;
-        if self.front_size == true {
+        if self.front_size {
             self.normal = outward_normal.clone();
         } else {
             self.normal = -outward_normal.clone();
