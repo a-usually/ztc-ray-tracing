@@ -46,8 +46,10 @@ impl Camera {
             origin: lookfrom.clone(),
             horizontal: u_0.clone() * viewport_width * focus_dist,
             vertical: v_0.clone() * viewport_height * focus_dist,
-            lower_left_corner: lookfrom.clone() - u_0.clone() * viewport_width * focus_dist / 2.0 
-            - v_0.clone() * viewport_height * focus_dist / 2.0 - w_0.clone() * focus_dist,
+            lower_left_corner: lookfrom.clone()
+                - u_0.clone() * viewport_width * focus_dist / 2.0
+                - v_0.clone() * viewport_height * focus_dist / 2.0
+                - w_0.clone() * focus_dist,
             w: w_0,
             u: u_0,
             v: v_0,
@@ -61,7 +63,11 @@ impl Camera {
 
         Ray::new(
             self.origin.clone() + offest.clone(),
-            self.lower_left_corner.clone() + self.horizontal.clone() * s + self.vertical.clone() * t - self.origin.clone() - offest,
+            self.lower_left_corner.clone()
+                + self.horizontal.clone() * s
+                + self.vertical.clone() * t
+                - self.origin.clone()
+                - offest,
         )
     }
 }

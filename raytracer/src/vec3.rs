@@ -1,5 +1,5 @@
-pub use std::ops::{Add, AddAssign, Sub, SubAssign ,Div, Mul, Neg};
 pub use crate::rtweekend::{random_f64, random_f64_1};
+pub use std::ops::{Add, AddAssign, Div, Mul, Neg, Sub, SubAssign};
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct Vec3 {
@@ -48,7 +48,7 @@ impl Vec3 {
         }
     }
 
-    pub fn elemul(v1: &Vec3,v2: &Vec3) -> Vec3 {
+    pub fn elemul(v1: &Vec3, v2: &Vec3) -> Vec3 {
         Self {
             x: v1.x * v2.x,
             y: v1.y * v2.y,
@@ -56,7 +56,7 @@ impl Vec3 {
         }
     }
 
-    pub fn cross(v1: &Vec3,v2: &Vec3) -> Vec3 {
+    pub fn cross(v1: &Vec3, v2: &Vec3) -> Vec3 {
         Self {
             x: v1.y * v2.z - v2.y * v1.z,
             y: v1.z * v2.x - v2.z * v1.x,
@@ -65,15 +65,19 @@ impl Vec3 {
     }
 
     pub fn random_vec3_1() -> Vec3 {
-        return Vec3::new((random_f64()) , (random_f64()), (random_f64()));
+        return Vec3::new((random_f64()), (random_f64()), (random_f64()));
     }
 
-    pub fn random_vec3_2(min: f64,max: f64) -> Vec3 {
-        return Vec3::new(random_f64_1(min, max),random_f64_1(min, max),random_f64_1(min, max));
+    pub fn random_vec3_2(min: f64, max: f64) -> Vec3 {
+        return Vec3::new(
+            random_f64_1(min, max),
+            random_f64_1(min, max),
+            random_f64_1(min, max),
+        );
     }
     pub fn random_in_unit_sphere() -> Vec3 {
         loop {
-            let p = Vec3::random_vec3_2(-1.0,1.0);
+            let p = Vec3::random_vec3_2(-1.0, 1.0);
             if p.squared_length() < 1.0 {
                 return p;
             }
@@ -98,43 +102,45 @@ impl Vec3 {
         loop {
             p = Vec3::new(random_f64_1(-1.0, 1.0), random_f64_1(-1.0, 1.0), 0.0);
             if p.clone().squared_length() < 1.0 {
-               return p;
+                return p;
             };
         }
     }
 
     pub fn near_zero(&self) -> bool {
-        let s :f64 = 1e-8;
-        return (self.x < s) && (self.x > -s) && (self.y < s) && (self.y > -s) && (self.z < s) && (self.z > -s);
+        let s: f64 = 1e-8;
+        return (self.x < s)
+            && (self.x > -s)
+            && (self.y < s)
+            && (self.y > -s)
+            && (self.z < s)
+            && (self.z > -s);
     }
 
     pub fn reflect(v: &Vec3, n: &Vec3) -> Vec3 {
-        v.clone() - Vec3::elemul(&(Vec3::elemul(&v,&n)),&n) * 2.0
-   }
+        v.clone() - Vec3::elemul(&(Vec3::elemul(&v, &n)), &n) * 2.0
+    }
 
-   pub fn refract(uv: &Vec3, n: &Vec3, etai_over_etat: f64) -> Vec3 {
+    pub fn refract(uv: &Vec3, n: &Vec3, etai_over_etat: f64) -> Vec3 {
         let cos_theta: f64;
         if ((-uv.clone()) * n.clone()) < 1.0 {
             cos_theta = (-uv.clone()) * n.clone();
-        }
-        else {
+        } else {
             cos_theta = 1.0;
         }
         let r_out_perp = (uv.clone() + n.clone() * cos_theta) * etai_over_etat;
-        let mut r_out_parallel = Vec3::new(0.0,0.0,0.0);
+        let mut r_out_parallel = Vec3::new(0.0, 0.0, 0.0);
         if 1.0 > r_out_perp.squared_length() {
             r_out_parallel = n.clone() * (-(1.0 - r_out_perp.squared_length()).sqrt());
-        } 
-        else {
+        } else {
             r_out_parallel = n.clone() * (-(r_out_perp.squared_length() - 1.0).sqrt());
         };
-       return r_out_perp + r_out_parallel;
-}
+        return r_out_perp + r_out_parallel;
+    }
 
-//    pub fn info(&self){
-//     println!("x:{},y:{},z:{}",self.x,self.y,self.z);
-//    }
-
+    //    pub fn info(&self){
+    //     println!("x:{},y:{},z:{}",self.x,self.y,self.z);
+    //    }
 }
 
 impl Add for Vec3 {
@@ -261,13 +267,12 @@ impl Neg for Vec3 {
 
     fn neg(self) -> Self {
         Self {
-            x: - self.x,
-            y: - self.y,
-            z: - self.z,
+            x: -self.x,
+            y: -self.y,
+            z: -self.z,
         }
     }
 }
-
 
 #[cfg(test)]
 mod tests {

@@ -1,27 +1,27 @@
-mod color;
-mod ray;
-mod vec3;
-mod rtweekend;
-mod hittable_list;
-mod hiitable;
-mod object;
 mod camera;
+mod color;
+mod hiitable;
+mod hittable_list;
 mod material;
+mod object;
+mod ray;
+mod rtweekend;
+mod vec3;
 
+pub use camera::Camera;
 use color::{color, write_color};
+pub use hiitable::Hiitable;
+pub use hittable_list::HittableList;
 use image::{ImageBuffer, RgbImage};
 use indicatif::ProgressBar;
+pub use material::{Lambertian, Material, Metal};
 use object::HitRecord;
-pub use ray::Ray;
-use std::fs::File;
-pub use vec3::Vec3;
-pub use rtweekend::{degrees_to_radians, random_f64, random_f64_1};
-pub use hittable_list::HittableList;
-pub use hiitable::Hiitable;
 pub use object::Sphere;
-pub use camera::Camera;
-pub use material::{Material,Lambertian,Metal};
+pub use ray::Ray;
+pub use rtweekend::{degrees_to_radians, random_f64, random_f64_1};
+use std::fs::File;
 use std::sync::Arc;
+pub use vec3::Vec3;
 
 use crate::material::Dielectric;
 
@@ -31,17 +31,21 @@ const INFINITY: f64 = f64::INFINITY;
 fn ray_color(r: &Ray, world: &mut HittableList, depth: i32) -> Vec3 {
     let mut rec: HitRecord = HitRecord::new();
     if depth <= 0 {
-        return Vec3:: new(0.0, 0.0, 0.0);
+        return Vec3::new(0.0, 0.0, 0.0);
     }
     if world.hit(r, 0.001, INFINITY, &mut rec) {
-        let mut scattered:Ray = Ray::new(Vec3::new(0.0, 0.0, 0.0), Vec3::new(0.0, 0.0, 0.0));
-        let mut attenuation:Vec3 = Vec3::new(0.0, 0.0, 0.0);
-        if rec.mat.clone().unwrap().scatter(r, &mut rec, &mut attenuation,&mut scattered){
-             return Vec3::elemul(&attenuation , &ray_color(&scattered, world, depth-1));
+        let mut scattered: Ray = Ray::new(Vec3::new(0.0, 0.0, 0.0), Vec3::new(0.0, 0.0, 0.0));
+        let mut attenuation: Vec3 = Vec3::new(0.0, 0.0, 0.0);
+        if rec
+            .mat
+            .clone()
+            .unwrap()
+            .scatter(r, &mut rec, &mut attenuation, &mut scattered)
+        {
+            return Vec3::elemul(&attenuation, &ray_color(&scattered, world, depth - 1));
         }
-        return Vec3::new(0.0,0.0,0.0);
-    }
-    else{
+        return Vec3::new(0.0, 0.0, 0.0);
+    } else {
         let unit_direction = r.direc.unit();
         let t = 0.5 * (unit_direction.y() + 1.0);
 
@@ -51,37 +55,46 @@ fn ray_color(r: &Ray, world: &mut HittableList, depth: i32) -> Vec3 {
         let x1 = tmp1.x as f64 * (1.0 - t) + (tmp2.x as f64) * t;
         let y1 = tmp1.y as f64 * (1.0 - t) + (tmp2.y as f64) * t;
         let z1 = tmp1.z as f64 * (1.0 - t) + (tmp2.z as f64) * t;
-    //println!("tmp={}{}{}", tmp[0], tmp[1], tmp[2]);
-        return Vec3::new(x1,y1,z1);
+        //println!("tmp={}{}{}", tmp[0], tmp[1], tmp[2]);
+        return Vec3::new(x1, y1, z1);
     }
 }
 
 fn random_scene() -> HittableList {
     let mut world = HittableList::new();
 
-    let ground_material: Option<Arc<dyn Material>> = Some(Arc::new(Lambertian::new(&Vec3::new(0.5,0.5,0.5))));
-    world.add(Some(Arc::new(Sphere::new(&Vec3::new(0.0, -1000.0, 0.0),1000.0,ground_material))));
+    let ground_material: Option<Arc<dyn Material>> =
+        Some(Arc::new(Lambertian::new(&Vec3::new(0.5, 0.5, 0.5))));
+    world.add(Some(Arc::new(Sphere::new(
+        &Vec3::new(0.0, -1000.0, 0.0),
+        1000.0,
+        ground_material,
+    ))));
 
     for a in -11..11 {
         for b in -11..11 {
             let choose_mat = random_f64();
-            let center = Vec3::new(a as f64 + 0.9 * random_f64(),0.2,b as f64 + 0.9 * random_f64(),);
+            let center = Vec3::new(
+                a as f64 + 0.9 * random_f64(),
+                0.2,
+                b as f64 + 0.9 * random_f64(),
+            );
 
             if (center.clone() - Vec3::new(4.0, 0.2, 0.0)).length() > 0.9 {
                 let sphere_material: Option<Arc<dyn Material>>;
                 if choose_mat < 0.8 {
                     //difuse
-                    let albedo = Vec3::elemul(&Vec3::random_vec3_1(),&Vec3::random_vec3_1());
+                    let albedo = Vec3::elemul(&Vec3::random_vec3_1(), &Vec3::random_vec3_1());
                     sphere_material = Some(Arc::new(Lambertian::new(&albedo)));
-                    world.add(Some(Arc::new(Sphere::new(&center,0.2,sphere_material))));
-                } 
+                    world.add(Some(Arc::new(Sphere::new(&center, 0.2, sphere_material))));
+                }
                 // else if choose_mat < 0.95 {
                 //     //metal
                 //     let albedo = Vec3::random_vec3_2(0.5, 1.0);
                 //     let fuzz = random_f64_1(0.0, 0.5);
                 //     sphere_material = Some(Arc::new(Metal::new(&albedo, fuzz)));
                 //     world.add(Some(Arc::new(Sphere::new(&center, 0.2, sphere_material))));
-                // } 
+                // }
                 else {
                     //glass
                     sphere_material = Some(Arc::new(Dielectric::new(1.5)));
@@ -92,17 +105,30 @@ fn random_scene() -> HittableList {
     }
 
     let material1: Option<Arc<dyn Material>> = Some(Arc::new(Dielectric::new(1.5)));
-    world.add(Some(Arc::new(Sphere::new(&Vec3::new(0.0, 1.0, 0.0),1.0,material1))));
+    world.add(Some(Arc::new(Sphere::new(
+        &Vec3::new(0.0, 1.0, 0.0),
+        1.0,
+        material1,
+    ))));
 
-    let material2: Option<Arc<dyn Material>> = Some(Arc::new(Lambertian::new(&Vec3::new(0.4, 0.2, 0.1))));
-    world.add(Some(Arc::new(Sphere::new(&Vec3::new(-4.0, 1.0, 0.0),1.0,material2))));
+    let material2: Option<Arc<dyn Material>> =
+        Some(Arc::new(Lambertian::new(&Vec3::new(0.4, 0.2, 0.1))));
+    world.add(Some(Arc::new(Sphere::new(
+        &Vec3::new(-4.0, 1.0, 0.0),
+        1.0,
+        material2,
+    ))));
 
-    let material3: Option<Arc<dyn Material>> = Some(Arc::new(Metal::new(&Vec3::new(0.7, 0.6, 0.5), 0.0)));
-    world.add(Some(Arc::new(Sphere::new(&Vec3::new(4.0, 1.0, 0.0),1.0,material3))));
+    let material3: Option<Arc<dyn Material>> =
+        Some(Arc::new(Metal::new(&Vec3::new(0.7, 0.6, 0.5), 0.0)));
+    world.add(Some(Arc::new(Sphere::new(
+        &Vec3::new(4.0, 1.0, 0.0),
+        1.0,
+        material3,
+    ))));
 
     return world;
 }
-
 
 fn is_ci() -> bool {
     option_env!("CI").unwrap_or_default() == "true"
@@ -122,11 +148,10 @@ fn main() {
     let samples_per_pixel = 20;
     let max_depth = 30;
 
-
     // Create image data
     let mut img: RgbImage = ImageBuffer::new(width.try_into().unwrap(), height.try_into().unwrap());
 
-     // World
+    // World
     // let mut world: HittableList = HittableList::new();
 
     // let material_ground: Option<Arc<dyn Material>> = Some(Arc::new(Lambertian::new(&Vec3::new(0.8,0.8,0.0))));
@@ -140,7 +165,6 @@ fn main() {
     // world.add(Some(Arc::new(Sphere::new(&Vec3::new(1.0, 0.0, -1.0),0.5,material_right))));
 
     let mut world = random_scene();
-
 
     // Progress bar UI powered by library `indicatif`
     // You can use indicatif::ProgressStyle to make it more beautiful
@@ -158,17 +182,25 @@ fn main() {
     let vfov = 20.0;
     let dist_to_focus = 10.0;
     let aperture = 0.1;
-    let cam: Camera = Camera::new(aspect_ratio,&lookfrom,&lookat,&vup,vfov,aperture,dist_to_focus);
+    let cam: Camera = Camera::new(
+        aspect_ratio,
+        &lookfrom,
+        &lookat,
+        &vup,
+        vfov,
+        aperture,
+        dist_to_focus,
+    );
 
     //image
     for j in 0..height {
         for i in 0..width {
-            let mut pixel_color:Vec3 = Vec3::new(0.0,0.0,0.0);
-            for _s in 0..samples_per_pixel{
+            let mut pixel_color: Vec3 = Vec3::new(0.0, 0.0, 0.0);
+            for _s in 0..samples_per_pixel {
                 let u = ((i as f64) + random_f64()) / (width as f64 - 1.0);
                 let v = ((j as f64) + random_f64()) / (height as f64 - 1.0);
                 let r = cam.get_ray(u, v);
-                let tmp = ray_color(&r, &mut world, max_depth);//[0-1]
+                let tmp = ray_color(&r, &mut world, max_depth); //[0-1]
                 pixel_color.x = pixel_color.x + tmp.x;
                 pixel_color.y = pixel_color.y + tmp.y;
                 pixel_color.z = pixel_color.z + tmp.z;
@@ -176,7 +208,7 @@ fn main() {
                 //ray_1.info();
             }
             //pixel_color.info();
-            write_color(&pixel_color, &mut img, i, height - j - 1, samples_per_pixel);//[0-255*sample]
+            write_color(&pixel_color, &mut img, i, height - j - 1, samples_per_pixel); //[0-255*sample]
             bar.inc(1);
         }
     }
