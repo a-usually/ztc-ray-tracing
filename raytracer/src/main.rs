@@ -5,6 +5,8 @@ mod rtweekend;
 mod hittable_list;
 mod hiitable;
 mod object;
+mod camera;
+mod material;
 
 use color::{color, write_color};
 use image::{ImageBuffer, RgbImage};
@@ -17,41 +19,90 @@ pub use rtweekend::{degrees_to_radians, random_f64, random_f64_1};
 pub use hittable_list::HittableList;
 pub use hiitable::Hiitable;
 pub use object::Sphere;
+pub use camera::Camera;
+pub use material::{Material,Lambertian,Metal};
+use std::sync::Arc;
+
+use crate::material::Dielectric;
 
 const AUTHOR: &str = "Zhang Tongcheng";
 const INFINITY: f64 = f64::INFINITY;
 
-fn ray_color(r: &Ray, world: &mut HittableList) -> [u8; 3] {
+fn ray_color(r: &Ray, world: &mut HittableList, depth: i32) -> Vec3 {
     let mut rec: HitRecord = HitRecord::new();
-    if world.hit(r, 0.0, INFINITY, &mut rec) {
-        let temp1: [u8;3] = color(1.0,1.0, 1.0);
-        let mut tmp: [u8;3] = [0; 3];
-
-        let x1 = temp1[0] as f64;
-        let y1 =  temp1[1] as f64;
-        let z1 = temp1[2] as f64;
-
-        tmp[0] = (x1 * 0.5) as u8;
-        tmp[1] = (y1 * 0.5) as u8;
-        tmp[2] = (z1 * 0.5) as u8;
-
-        return tmp;
+    if depth <= 0 {
+        return Vec3:: new(0.0, 0.0, 0.0);
+    }
+    if world.hit(r, 0.001, INFINITY, &mut rec) {
+        let mut scattered:Ray = Ray::new(Vec3::new(0.0, 0.0, 0.0), Vec3::new(0.0, 0.0, 0.0));
+        let mut attenuation:Vec3 = Vec3::new(0.0, 0.0, 0.0);
+        if rec.mat.clone().unwrap().scatter(r, &mut rec, &mut attenuation,&mut scattered){
+             return Vec3::elemul(&attenuation , &ray_color(&scattered, world, depth-1));
+        }
+        return Vec3::new(0.0,0.0,0.0);
     }
     else{
         let unit_direction = r.direc.unit();
         let t = 0.5 * (unit_direction.y() + 1.0);
 
-        let tmp1 = color(1.0, 1.0, 1.0);
-        let tmp2 = color(0.5, 0.7, 1.0);
-        let mut tmp: [u8; 3] = [0; 3];
+        let tmp1 = Vec3::new(1.0, 1.0, 1.0);
+        let tmp2 = Vec3::new(0.5, 0.7, 1.0);
 
-        tmp[0] = (tmp1[0] as f64 * (1.0 - t) + (tmp2[0] as f64) * t) as u8;
-        tmp[1] = (tmp1[1] as f64 * (1.0 - t) + (tmp2[1] as f64) * t) as u8;
-        tmp[2] = (tmp1[2] as f64 * (1.0 - t) + (tmp2[2] as f64) * t) as u8;
+        let x1 = tmp1.x as f64 * (1.0 - t) + (tmp2.x as f64) * t;
+        let y1 = tmp1.y as f64 * (1.0 - t) + (tmp2.y as f64) * t;
+        let z1 = tmp1.z as f64 * (1.0 - t) + (tmp2.z as f64) * t;
     //println!("tmp={}{}{}", tmp[0], tmp[1], tmp[2]);
-        return tmp
+        return Vec3::new(x1,y1,z1);
     }
 }
+
+fn random_scene() -> HittableList {
+    let mut world = HittableList::new();
+
+    let ground_material: Option<Arc<dyn Material>> = Some(Arc::new(Lambertian::new(&Vec3::new(0.5,0.5,0.5))));
+    world.add(Some(Arc::new(Sphere::new(&Vec3::new(0.0, -1000.0, 0.0),1000.0,ground_material))));
+
+    for a in -11..11 {
+        for b in -11..11 {
+            let choose_mat = random_f64();
+            let center = Vec3::new(a as f64 + 0.9 * random_f64(),0.2,b as f64 + 0.9 * random_f64(),);
+
+            if (center.clone() - Vec3::new(4.0, 0.2, 0.0)).length() > 0.9 {
+                let sphere_material: Option<Arc<dyn Material>>;
+                if choose_mat < 0.8 {
+                    //difuse
+                    let albedo = Vec3::elemul(&Vec3::random_vec3_1(),&Vec3::random_vec3_1());
+                    sphere_material = Some(Arc::new(Lambertian::new(&albedo)));
+                    world.add(Some(Arc::new(Sphere::new(&center,0.2,sphere_material))));
+                } 
+                // else if choose_mat < 0.95 {
+                //     //metal
+                //     let albedo = Vec3::random_vec3_2(0.5, 1.0);
+                //     let fuzz = random_f64_1(0.0, 0.5);
+                //     sphere_material = Some(Arc::new(Metal::new(&albedo, fuzz)));
+                //     world.add(Some(Arc::new(Sphere::new(&center, 0.2, sphere_material))));
+                // } 
+                else {
+                    //glass
+                    sphere_material = Some(Arc::new(Dielectric::new(1.5)));
+                    world.add(Some(Arc::new(Sphere::new(&center, 0.2, sphere_material))));
+                }
+            }
+        }
+    }
+
+    let material1: Option<Arc<dyn Material>> = Some(Arc::new(Dielectric::new(1.5)));
+    world.add(Some(Arc::new(Sphere::new(&Vec3::new(0.0, 1.0, 0.0),1.0,material1))));
+
+    let material2: Option<Arc<dyn Material>> = Some(Arc::new(Lambertian::new(&Vec3::new(0.4, 0.2, 0.1))));
+    world.add(Some(Arc::new(Sphere::new(&Vec3::new(-4.0, 1.0, 0.0),1.0,material2))));
+
+    let material3: Option<Arc<dyn Material>> = Some(Arc::new(Metal::new(&Vec3::new(0.7, 0.6, 0.5), 0.0)));
+    world.add(Some(Arc::new(Sphere::new(&Vec3::new(4.0, 1.0, 0.0),1.0,material3))));
+
+    return world;
+}
+
 
 fn is_ci() -> bool {
     option_env!("CI").unwrap_or_default() == "true"
@@ -63,42 +114,33 @@ fn main() {
 
     println!("CI: {}", is_ci);
 
-    let height = 800;
-    let width = 800;
+    let aspect_ratio = 16.0 / 9.0;
+    let height = 225;
+    let width = 400;
     let path = "output/test.jpg";
     let quality = 60; // From 0 to 100, suggested value: 60
+    let samples_per_pixel = 20;
+    let max_depth = 30;
 
-    let viewport_height: f64 = 2.0;
-    let viewport_width: f64 = viewport_height;
-    let focal_length: f64 = 1.0;
-
-    let origin: Vec3 = Vec3 {
-        x: 0.0,
-        y: 0.0,
-        z: 0.0,
-    };
-    let horizontal: Vec3 = Vec3 {
-        x: viewport_width,
-        y: 0.0,
-        z: 0.0,
-    };
-    let vertical: Vec3 = Vec3 {
-        x: 0.0,
-        y: viewport_height,
-        z: 0.0,
-    };
-    let lower_left_corner: Vec3 = origin.clone()
-        - horizontal.clone() / 2.0
-        - vertical.clone() / 2.0
-        - Vec3::new(0.0, 0.0, focal_length);
 
     // Create image data
     let mut img: RgbImage = ImageBuffer::new(width.try_into().unwrap(), height.try_into().unwrap());
 
      // World
-    let mut world: HittableList = HittableList::new();
-    world.add(Sphere::new(Vec3::new(0.0, 0.0, -1.0), 0.5 ,));
-    world.add(Sphere::new(Vec3::new(0.0, -100.5, -1.0), 100.0, ));
+    // let mut world: HittableList = HittableList::new();
+
+    // let material_ground: Option<Arc<dyn Material>> = Some(Arc::new(Lambertian::new(&Vec3::new(0.8,0.8,0.0))));
+    // let material_center: Option<Arc<dyn Material>> = Some(Arc::new(Lambertian::new(&Vec3::new(0.1,0.2,0.5))));
+    // let material_left: Option<Arc<dyn Material>> = Some(Arc::new(Dielectric::new(1.5)));
+    // let material_right: Option<Arc<dyn Material>> = Some(Arc::new(Metal::new(&Vec3::new(0.8,0.6,0.2), 0.0 )));
+
+    // world.add(Some(Arc::new(Sphere::new(&Vec3::new(0.0, -100.5, -1.0),100.0,material_ground))));
+    // world.add(Some(Arc::new(Sphere::new(&Vec3::new(0.0, 0.0, -1.0),0.5,material_center))));
+    // world.add(Some(Arc::new(Sphere::new(&Vec3::new(-1.0, 0.0, -1.0),0.5,material_left))));
+    // world.add(Some(Arc::new(Sphere::new(&Vec3::new(1.0, 0.0, -1.0),0.5,material_right))));
+
+    let mut world = random_scene();
+
 
     // Progress bar UI powered by library `indicatif`
     // You can use indicatif::ProgressStyle to make it more beautiful
@@ -109,19 +151,32 @@ fn main() {
         ProgressBar::new((height * width) as u64)
     };
 
-    for j in (0..height).rev() {
-        for i in 0..width {
-            let u = (i as f64) / (width as f64 - 1.0);
-            let v = (j as f64) / (height as f64 - 1.0);
+    //camera
+    let lookfrom = Vec3::new(13.0, 2.0, 3.0);
+    let lookat = Vec3::new(0.0, 0.0, 0.0);
+    let vup = Vec3::new(0.0, 1.0, 0.0);
+    let vfov = 20.0;
+    let dist_to_focus = 10.0;
+    let aperture = 0.1;
+    let cam: Camera = Camera::new(aspect_ratio,&lookfrom,&lookat,&vup,vfov,aperture,dist_to_focus);
 
-            let ray_1: Ray = Ray {
-                ori: origin.clone(),
-                direc: lower_left_corner.clone() + horizontal.clone() * u + vertical.clone() * v
-                    - origin.clone(),
-            };
-            //ray_1.info();
-            let pixel_color = ray_color(&ray_1, &mut world);
-            write_color(pixel_color, &mut img, i, height - j - 1);
+    //image
+    for j in 0..height {
+        for i in 0..width {
+            let mut pixel_color:Vec3 = Vec3::new(0.0,0.0,0.0);
+            for _s in 0..samples_per_pixel{
+                let u = ((i as f64) + random_f64()) / (width as f64 - 1.0);
+                let v = ((j as f64) + random_f64()) / (height as f64 - 1.0);
+                let r = cam.get_ray(u, v);
+                let tmp = ray_color(&r, &mut world, max_depth);//[0-1]
+                pixel_color.x = pixel_color.x + tmp.x;
+                pixel_color.y = pixel_color.y + tmp.y;
+                pixel_color.z = pixel_color.z + tmp.z;
+
+                //ray_1.info();
+            }
+            //pixel_color.info();
+            write_color(&pixel_color, &mut img, i, height - j - 1, samples_per_pixel);//[0-255*sample]
             bar.inc(1);
         }
     }

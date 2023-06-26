@@ -1,18 +1,22 @@
 pub use crate::vec3::Vec3;
 pub use crate::hiitable::{Hiitable,HitRecord};
 pub use crate::ray::Ray;
+pub use crate::material::Material;
+use std::sync::Arc;
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone)]
 pub struct Sphere {
     pub center: Vec3,
     pub radius: f64,
+    pub mat: Option<Arc<dyn Material>>,
 }
 
 impl Sphere{
-    pub fn new(cen: Vec3, r: f64, ) -> Self {
+    pub fn new(c: &Vec3, r: f64, m: Option<Arc<dyn Material>>) -> Self {
         Self {
-            center: cen,
+            center: c.clone(),
             radius: r,
+            mat: m,
         }
     }
 }
@@ -44,6 +48,7 @@ impl Hiitable for Sphere{
         rec.normal = (rec.point3.clone() - self.center.clone()) / self.radius;
         let outward_normal = (rec.point3.clone() - self.center.clone()) / self.radius;
         rec.set_front_size(r,&outward_normal);
+        rec.mat = self.mat.clone();
 
         return true;
     }

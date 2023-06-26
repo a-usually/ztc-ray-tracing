@@ -10,6 +10,13 @@ impl Ray {
         println!("ray{}", self.direc.x());
     }
 
+    pub fn new(origin: Vec3, direction: Vec3) -> Ray {
+        Ray {
+            ori: Vec3::new(origin.x, origin.y, origin.z),
+            direc: Vec3::new(direction.x, direction.y, direction.z),
+        }
+    }
+
     pub fn at(&self, t: f64) -> Vec3 {
         self.ori.clone() + self.direc.clone() * t
     }
