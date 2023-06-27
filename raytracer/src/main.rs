@@ -143,8 +143,8 @@ fn main() {
     let width = 400;
     let path = "output/test.jpg";
     let quality = 60; // From 0 to 100, suggested value: 60
-    let samples_per_pixel = 20;
-    let max_depth = 30;
+    let samples_per_pixel = 500;
+    let max_depth = 50;
 
     // Create image data
     let mut img: RgbImage = ImageBuffer::new(width.try_into().unwrap(), height.try_into().unwrap());
