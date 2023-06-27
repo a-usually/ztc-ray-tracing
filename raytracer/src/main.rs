@@ -210,9 +210,7 @@ fn main() {
         &vup,
         vfov,
         aperture,
-        dist_to_focus,
-        time_start,
-        time_end,
+        (dist_to_focus, time_start, time_end),
     );
 
     //image

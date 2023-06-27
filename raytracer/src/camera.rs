@@ -29,10 +29,9 @@ impl Camera {
         vup: &Vec3,
         vfov: f64,
         aperture: f64,
-        focus_dist: f64,
-        _time_0: f64,
-        _time_1: f64,
+        combine: (f64, f64, f64),
     ) -> Self {
+        let (focus_dist, _time_0, _time_1) = combine;
         let theta = degrees_to_radians(vfov);
         let h = (theta / 2.0).tan();
         let viewport_height = 2.0 * h;
