@@ -2,7 +2,12 @@ pub use crate::hiitable::HitRecord;
 pub use crate::moving_sphere::MovingSphere;
 use crate::random_f64;
 pub use crate::ray::Ray;
+pub use crate::texture::SolidColor;
+use crate::texture::Texture;
 pub use crate::vec3::Vec3;
+
+use std::sync::Arc;
+
 pub trait Material {
     fn scatter(
         &self,
@@ -14,11 +19,17 @@ pub trait Material {
 }
 
 pub struct Lambertian {
-    albedo: Vec3,
+    albedo: Option<Arc<dyn Texture>>,
 }
 
 impl Lambertian {
-    pub fn new(a: &Vec3) -> Self {
+    pub fn new1(a: &Vec3) -> Self {
+        Self {
+            albedo: Some(Arc::new(SolidColor::new(a.clone()))),
+        }
+    }
+
+    pub fn new2(a: &Option<Arc<dyn Texture>>) -> Self {
         Self { albedo: a.clone() }
     }
 }
@@ -36,7 +47,11 @@ impl Material for Lambertian {
             scatter_direction = rec.normal.clone();
         }
         *scattered = Ray::new(rec.point3.clone(), scatter_direction, _r_in.tm());
-        *attenuation = self.albedo.clone();
+        *attenuation = self
+            .albedo
+            .clone()
+            .unwrap()
+            .value(rec.u, rec.v, &mut rec.point3);
         true
     }
 }

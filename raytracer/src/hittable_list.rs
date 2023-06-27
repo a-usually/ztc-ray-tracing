@@ -1,6 +1,7 @@
-use crate::hiitable::{Hiitable, HitRecord};
+pub use crate::aabb::AAbb;
+pub use crate::hiitable::{Hiitable, HitRecord};
+pub use crate::ray::Ray;
 
-use crate::ray::Ray;
 use std::sync::Arc;
 
 #[derive(Clone)]
@@ -39,7 +40,32 @@ impl HittableList {
         }
         hit_anything
     }
+
     pub fn add(&mut self, object: Option<Arc<dyn Hiitable>>) {
         self.objects.push(object);
+    }
+
+    pub fn bounding_box(&self, time0: f64, time1: f64, output_box: &mut AAbb) -> bool {
+        if self.objects.is_empty() {
+            return false;
+        }
+        let mut temp_box: AAbb = AAbb::new_0();
+        let mut first_box = true;
+        for object in (*self).clone().objects {
+            if object
+                .clone()
+                .unwrap()
+                .bounding_box(time0, time1, &mut temp_box)
+            {
+                return false;
+            }
+            *output_box = if first_box {
+                temp_box.clone()
+            } else {
+                AAbb::surrounding_box(output_box, &temp_box)
+            };
+            first_box = false;
+        }
+        true
     }
 }

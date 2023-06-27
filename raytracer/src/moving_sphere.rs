@@ -1,8 +1,8 @@
+pub use crate::aabb::AAbb;
 pub use crate::hiitable::{Hiitable, HitRecord};
 pub use crate::material::Material;
 pub use crate::ray::Ray;
 pub use crate::vec3::Vec3;
-
 use std::sync::Arc;
 
 pub struct MovingSphere {
@@ -79,6 +79,39 @@ impl Hiitable for MovingSphere {
         rec.set_front_size(r, &outward_normal);
         rec.mat = self.mat.clone();
 
+        true
+    }
+
+    fn bounding_box(&self, time0: f64, time1: f64, output_box: &mut AAbb) -> bool {
+        let box0 = AAbb::new(
+            self.center(time0.clone())
+                - Vec3::new(
+                    self.radius.clone(),
+                    self.radius.clone(),
+                    self.radius.clone(),
+                ),
+            self.center(time0.clone())
+                + Vec3::new(
+                    self.radius.clone(),
+                    self.radius.clone(),
+                    self.radius.clone(),
+                ),
+        );
+        let box1 = AAbb::new(
+            self.center(time1.clone())
+                - Vec3::new(
+                    self.radius.clone(),
+                    self.radius.clone(),
+                    self.radius.clone(),
+                ),
+            self.center(time1.clone())
+                + Vec3::new(
+                    self.radius.clone(),
+                    self.radius.clone(),
+                    self.radius.clone(),
+                ),
+        );
+        *output_box = AAbb::surrounding_box(&box0, &box1);
         true
     }
 }

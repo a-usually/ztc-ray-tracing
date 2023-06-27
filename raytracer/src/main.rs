@@ -1,3 +1,5 @@
+mod aabb;
+mod bvh;
 mod camera;
 mod color;
 mod hiitable;
@@ -7,6 +9,7 @@ mod moving_sphere;
 mod object;
 mod ray;
 mod rtweekend;
+mod texture;
 mod vec3;
 
 pub use camera::Camera;
@@ -21,6 +24,7 @@ use object::HitRecord;
 pub use object::Sphere;
 pub use ray::Ray;
 pub use rtweekend::{degrees_to_radians, random_f64, random_f64_1};
+pub use texture::{CheckerTexture, Texture};
 pub use vec3::Vec3;
 
 use std::fs::File;
@@ -70,12 +74,14 @@ fn ray_color(r: &Ray, world: &mut HittableList, depth: i32) -> Vec3 {
 fn random_scene() -> HittableList {
     let mut world = HittableList::new();
 
-    let ground_material: Option<Arc<dyn Material>> =
-        Some(Arc::new(Lambertian::new(&Vec3::new(0.5, 0.5, 0.5))));
+    let checker: Option<Arc<dyn Texture>> = Some(Arc::new(CheckerTexture::new_2(
+        Vec3::new(0.2, 0.3, 0.1),
+        Vec3::new(0.9, 0.9, 0.9),
+    )));
     world.add(Some(Arc::new(Sphere::new(
         &Vec3::new(0.0, -1000.0, 0.0),
         1000.0,
-        ground_material,
+        Some(Arc::new(Lambertian::new2(&checker))),
     ))));
 
     for a in -11..11 {
@@ -92,7 +98,7 @@ fn random_scene() -> HittableList {
                 if choose_mat < 0.8 {
                     //difuse
                     let albedo = Vec3::elemul(&Vec3::random_vec3_1(), &Vec3::random_vec3_1());
-                    sphere_material = Some(Arc::new(Lambertian::new(&albedo)));
+                    sphere_material = Some(Arc::new(Lambertian::new1(&albedo)));
                     let center2 = center.clone() + Vec3::new(0.0, random_f64_1(0.0, 0.5), 0.0);
                     world.add(Some(Arc::new(MovingSphere::new(
                         center.clone(),
@@ -125,7 +131,7 @@ fn random_scene() -> HittableList {
     ))));
 
     let material2: Option<Arc<dyn Material>> =
-        Some(Arc::new(Lambertian::new(&Vec3::new(0.4, 0.2, 0.1))));
+        Some(Arc::new(Lambertian::new1(&Vec3::new(0.4, 0.2, 0.1))));
     world.add(Some(Arc::new(Sphere::new(
         &Vec3::new(-4.0, 1.0, 0.0),
         1.0,

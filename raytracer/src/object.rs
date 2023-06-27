@@ -1,7 +1,10 @@
+pub use crate::aabb::AAbb;
 pub use crate::hiitable::{Hiitable, HitRecord};
 pub use crate::material::Material;
 pub use crate::ray::Ray;
 pub use crate::vec3::Vec3;
+
+use std::f64::consts::PI;
 use std::sync::Arc;
 
 #[derive(Clone)]
@@ -18,6 +21,14 @@ impl Sphere {
             radius: r,
             mat: m,
         }
+    }
+
+    pub fn get_sphere_uv(p: &Vec3, u: &mut f64, v: &mut f64) {
+        let theta = (-p.y()).acos();
+        let phi = (-p.z()).atan2(p.x()) + (PI as f64);
+
+        *u = phi / (2.0 * (PI as f64));
+        *v = theta / (PI as f64);
     }
 }
 
@@ -47,8 +58,27 @@ impl Hiitable for Sphere {
         rec.normal = (rec.point3.clone() - self.center.clone()) / self.radius;
         let outward_normal = (rec.point3.clone() - self.center.clone()) / self.radius;
         rec.set_front_size(r, &outward_normal);
+        Sphere::get_sphere_uv(&outward_normal, &mut rec.u, &mut rec.v);
         rec.mat = self.mat.clone();
 
+        true
+    }
+
+    fn bounding_box(&self, _time0: f64, _time1: f64, output_box: &mut AAbb) -> bool {
+        *output_box = AAbb::new(
+            self.center.clone()
+                - Vec3::new(
+                    self.radius.clone(),
+                    self.radius.clone(),
+                    self.radius.clone(),
+                ),
+            self.center.clone()
+                + Vec3::new(
+                    self.radius.clone(),
+                    self.radius.clone(),
+                    self.radius.clone(),
+                ),
+        );
         true
     }
 }
