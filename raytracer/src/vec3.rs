@@ -143,7 +143,6 @@ impl Vec3 {
 
 impl Add for Vec3 {
     type Output = Self;
-
     fn add(self, other: Self) -> Self {
         Self {
             x: self.x + other.x,
@@ -155,7 +154,6 @@ impl Add for Vec3 {
 
 impl Add<f64> for Vec3 {
     type Output = Self;
-
     fn add(self, other: f64) -> Self {
         Self {
             x: self.x + other,
@@ -187,7 +185,6 @@ impl AddAssign<f64> for Vec3 {
 
 impl Sub for Vec3 {
     type Output = Self;
-
     fn sub(self, other: Self) -> Self {
         Self {
             x: self.x - other.x,
@@ -199,7 +196,6 @@ impl Sub for Vec3 {
 
 impl Sub<f64> for Vec3 {
     type Output = Self;
-
     fn sub(self, other: f64) -> Self {
         Self {
             x: self.x - other,
@@ -238,7 +234,6 @@ impl Mul for Vec3 {
 
 impl Mul<f64> for Vec3 {
     type Output = Self;
-
     fn mul(self, other: f64) -> Self {
         Self {
             x: self.x * other,
@@ -250,7 +245,6 @@ impl Mul<f64> for Vec3 {
 
 impl Div<f64> for Vec3 {
     type Output = Self;
-
     fn div(self, other: f64) -> Self {
         Self {
             x: self.x / other,
@@ -262,7 +256,6 @@ impl Div<f64> for Vec3 {
 
 impl Neg for Vec3 {
     type Output = Self;
-
     fn neg(self) -> Self {
         Self {
             x: -self.x,
