@@ -66,18 +66,8 @@ impl Hiitable for Sphere {
 
     fn bounding_box(&self, _time0: f64, _time1: f64, output_box: &mut AAbb) -> bool {
         *output_box = AAbb::new(
-            self.center.clone()
-                - Vec3::new(
-                    self.radius,
-                    self.radius,
-                    self.radius,
-                ),
-            self.center.clone()
-                + Vec3::new(
-                    self.radius,
-                    self.radius,
-                    self.radius,
-                ),
+            self.center.clone() - Vec3::new(self.radius, self.radius, self.radius),
+            self.center.clone() + Vec3::new(self.radius, self.radius, self.radius),
         );
         true
     }

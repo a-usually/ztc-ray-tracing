@@ -11,21 +11,19 @@ pub struct SolidColor {
 }
 
 impl SolidColor {
-    pub fn new_0() -> Self {
-        Self {
-            color_value: Vec3::new(0.0, 0.0, 0.0),
-        }
-    }
+    // pub fn new_0() -> Self {
+    //     Self {
+    //         color_value: Vec3::new(0.0, 0.0, 0.0),
+    //     }
+    // }
 
     pub fn new(c: Vec3) -> Self {
-        Self {
-            color_value: c,
-        }
+        Self { color_value: c }
     }
 
-    pub fn color_value(&self) -> Vec3 {
-        self.color_value.clone()
-    }
+    // pub fn color_value(&self) -> Vec3 {
+    //     self.color_value.clone()
+    // }
 }
 
 impl Texture for SolidColor {
