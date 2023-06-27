@@ -9,13 +9,14 @@ use crate::rtweekend::random_i32_1;
 use std::cmp::Ordering::{Greater, Less};
 use std::sync::Arc;
 
-pub struct BVH_node {
+#[derive(Clone)]
+pub struct BvhNode {
     left: Option<Arc<dyn Hiitable>>,
     right: Option<Arc<dyn Hiitable>>,
     box_bvh: AAbb,
 }
 
-impl BVH_node {
+impl BvhNode {
     pub fn box_compare(
         a: &Option<Arc<dyn Hiitable>>,
         b: &Option<Arc<dyn Hiitable>>,
@@ -35,30 +36,30 @@ impl BVH_node {
         a: &Option<Arc<dyn Hiitable>>,
         b: &Option<Arc<dyn Hiitable>>,
     ) -> std::cmp::Ordering {
-        if BVH_node::box_compare(a, b, 0) {
+        if BvhNode::box_compare(a, b, 0) {
             return Less;
         }
-        return Greater;
+        Greater
     }
 
     pub fn box_y_compare(
         a: &Option<Arc<dyn Hiitable>>,
         b: &Option<Arc<dyn Hiitable>>,
     ) -> std::cmp::Ordering {
-        if BVH_node::box_compare(a, b, 1) {
+        if BvhNode::box_compare(a, b, 1) {
             return Less;
         }
-        return Greater;
+        Greater
     }
 
     pub fn box_z_compare(
         a: &Option<Arc<dyn Hiitable>>,
         b: &Option<Arc<dyn Hiitable>>,
     ) -> std::cmp::Ordering {
-        if BVH_node::box_compare(a, b, 2) {
+        if BvhNode::box_compare(a, b, 2) {
             return Less;
         }
-        return Greater;
+        Greater
     }
 
     pub fn new(
@@ -71,16 +72,16 @@ impl BVH_node {
         let objects = str_objects;
         let axis = random_i32_1(0, 2);
         let comparator = if axis == 0 {
-            BVH_node::box_x_compare
+            BvhNode::box_x_compare
         } else if axis == 1 {
-            BVH_node::box_y_compare
+            BvhNode::box_y_compare
         } else {
-            BVH_node::box_z_compare
+            BvhNode::box_z_compare
         };
 
         let object_span = end - start;
-        let mut left_0: Option<Arc<dyn Hiitable>>;
-        let mut right_0: Option<Arc<dyn Hiitable>>;
+        let left_0: Option<Arc<dyn Hiitable>>;
+        let right_0: Option<Arc<dyn Hiitable>>;
         if object_span == 1 {
             left_0 = objects[start].clone();
             right_0 = objects[start].clone();
@@ -95,19 +96,19 @@ impl BVH_node {
         } else {
             objects.as_mut_slice()[start..end].sort_by(comparator);
             let mid = start + object_span / 2;
-            left_0 = Some(Arc::new(BVH_node::new(
+            left_0 = Some(Arc::new(BvhNode::new(
                 objects,
                 start,
                 mid,
-                time0.clone(),
-                time1.clone(),
+                time0,
+                time1,
             )));
-            right_0 = Some(Arc::new(BVH_node::new(
+            right_0 = Some(Arc::new(BvhNode::new(
                 objects,
                 mid,
                 end,
-                time0.clone(),
-                time1.clone(),
+                time0,
+                time1,
             )))
         }
 
@@ -134,21 +135,19 @@ impl BVH_node {
     }
 }
 
-impl Hiitable for BVH_node {
+impl Hiitable for BvhNode {
     fn hit(&self, r: &Ray, t_min: f64, t_max: f64, rec: &mut HitRecord) -> bool {
         if !self.box_bvh.clone().hit(r, t_min, t_max) {
             return false;
         }
-        let hit_left = self.clone().left.clone().unwrap().hit(r, t_min, t_max, rec);
+        let hit_left = self.left.clone().unwrap().hit(r, t_min, t_max, rec);
         let hit_right = if hit_left {
-            self.clone()
-                .right
+            self.right
                 .clone()
                 .unwrap()
                 .hit(r, t_min, rec.clone().t, rec)
         } else {
-            self.clone()
-                .right
+            self.right
                 .clone()
                 .unwrap()
                 .hit(r, t_min, t_max, rec)
@@ -157,7 +156,7 @@ impl Hiitable for BVH_node {
         hit_left || hit_right
     }
 
-    fn bounding_box(&self, time0: f64, time1: f64, output_box: &mut AAbb) -> bool {
+    fn bounding_box(&self, _time0: f64, _time1: f64, output_box: &mut AAbb) -> bool {
         *output_box = self.box_bvh.clone();
         true
     }

@@ -19,7 +19,7 @@ impl SolidColor {
 
     pub fn new(c: Vec3) -> Self {
         Self {
-            color_value: c.clone(),
+            color_value: c,
         }
     }
 
