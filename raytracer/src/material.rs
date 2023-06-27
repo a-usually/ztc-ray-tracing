@@ -1,8 +1,8 @@
 pub use crate::hiitable::HitRecord;
-pub use crate::moving_sphere::MovingSphere;
 use crate::random_f64;
 pub use crate::ray::Ray;
 pub use crate::vec3::Vec3;
+
 pub trait Material {
     fn scatter(
         &self,
@@ -35,7 +35,7 @@ impl Material for Lambertian {
         if scatter_direction.near_zero() {
             scatter_direction = rec.normal.clone();
         }
-        *scattered = Ray::new(rec.point3.clone(), scatter_direction, _r_in.tm());
+        *scattered = Ray::new(rec.point3.clone(), scatter_direction);
         *attenuation = self.albedo.clone();
         true
     }
@@ -73,7 +73,6 @@ impl Material for Metal {
         *scattered = Ray::new(
             rec.point3.clone(),
             reflected + Vec3::random_in_unit_sphere() * self.fuzz,
-            r_in.tm,
         );
         *attenuation = self.albedo.clone();
 
@@ -133,7 +132,7 @@ impl Material for Dielectric {
             Vec3::refract(&unit_direction, &rec.normal, refraction_ratio)
         };
 
-        *scattered = Ray::new(rec.point3.clone(), direction, r_in.tm);
+        *scattered = Ray::new(rec.point3.clone(), direction);
 
         true
     }
