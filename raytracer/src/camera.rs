@@ -1,4 +1,4 @@
-use crate::{ray, rtweekend, vec3};
+use crate::{random_f64_1, ray, rtweekend, vec3};
 
 pub use ray::Ray;
 pub use rtweekend::degrees_to_radians;
@@ -17,6 +17,8 @@ pub struct Camera {
     pub v: Vec3,
     pub w: Vec3,
     lens_radius: f64,
+    time_0: f64,
+    time_1: f64,
 }
 
 impl Camera {
@@ -28,6 +30,8 @@ impl Camera {
         vfov: f64,
         aperture: f64,
         focus_dist: f64,
+        _time_0: f64,
+        _time_1: f64,
     ) -> Self {
         let theta = degrees_to_radians(vfov);
         let h = (theta / 2.0).tan();
@@ -54,6 +58,8 @@ impl Camera {
             u: u_0,
             v: v_0,
             lens_radius: aperture / 2.0,
+            time_0: _time_0,
+            time_1: _time_1,
         }
     }
 
@@ -68,6 +74,7 @@ impl Camera {
                 + self.vertical.clone() * t
                 - self.origin.clone()
                 - offest,
+            random_f64_1(self.time_0, self.time_1),
         )
     }
 }
