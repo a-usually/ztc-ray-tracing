@@ -3,6 +3,7 @@ mod color;
 mod hiitable;
 mod hittable_list;
 mod material;
+mod moving_sphere;
 mod object;
 mod ray;
 mod rtweekend;
@@ -15,13 +16,15 @@ pub use hittable_list::HittableList;
 use image::{ImageBuffer, RgbImage};
 use indicatif::ProgressBar;
 pub use material::{Lambertian, Material, Metal};
+pub use moving_sphere::MovingSphere;
 use object::HitRecord;
 pub use object::Sphere;
 pub use ray::Ray;
 pub use rtweekend::{degrees_to_radians, random_f64, random_f64_1};
+pub use vec3::Vec3;
+
 use std::fs::File;
 use std::sync::Arc;
-pub use vec3::Vec3;
 
 use crate::material::Dielectric;
 
@@ -34,7 +37,11 @@ fn ray_color(r: &Ray, world: &mut HittableList, depth: i32) -> Vec3 {
         return Vec3::new(0.0, 0.0, 0.0);
     }
     if world.hit(r, 0.001, INFINITY, &mut rec) {
-        let mut scattered: Ray = Ray::new(Vec3::new(0.0, 0.0, 0.0), Vec3::new(0.0, 0.0, 0.0));
+        let mut scattered: Ray = Ray::new(
+            Vec3::new(0.0, 0.0, 0.0),
+            Vec3::new(0.0, 0.0, 0.0),
+            random_f64_1(0.0, 1.0),
+        );
         let mut attenuation: Vec3 = Vec3::new(0.0, 0.0, 0.0);
         if rec
             .mat
@@ -86,7 +93,15 @@ fn random_scene() -> HittableList {
                     //difuse
                     let albedo = Vec3::elemul(&Vec3::random_vec3_1(), &Vec3::random_vec3_1());
                     sphere_material = Some(Arc::new(Lambertian::new(&albedo)));
-                    world.add(Some(Arc::new(Sphere::new(&center, 0.2, sphere_material))));
+                    let center2 = center.clone() + Vec3::new(0.0, random_f64_1(0.0, 0.5), 0.0);
+                    world.add(Some(Arc::new(MovingSphere::new(
+                        center.clone(),
+                        center2.clone(),
+                        0.0,
+                        1.0,
+                        0.2,
+                        sphere_material,
+                    ))));
                 } else if choose_mat < 0.95 {
                     //metal
                     let albedo = Vec3::random_vec3_2(0.5, 1.0);
@@ -139,12 +154,12 @@ fn main() {
     println!("CI: {}", is_ci);
 
     let aspect_ratio = 16.0 / 9.0;
-    let height = 800;
-    let width = 1200;
+    let height = 225;
+    let width = 400;
     let path = "output/test.jpg";
     let quality = 60; // From 0 to 100, suggested value: 60
-    let samples_per_pixel = 600;
-    let max_depth = 50;
+    let samples_per_pixel = 4;
+    let max_depth = 20;
 
     // Create image data
     let mut img: RgbImage = ImageBuffer::new(width.try_into().unwrap(), height.try_into().unwrap());
@@ -180,6 +195,8 @@ fn main() {
     let vfov = 20.0;
     let dist_to_focus = 10.0;
     let aperture = 0.1;
+    let time_start = 0.0;
+    let time_end = 1.0;
     let cam: Camera = Camera::new(
         aspect_ratio,
         &lookfrom,
@@ -188,6 +205,8 @@ fn main() {
         vfov,
         aperture,
         dist_to_focus,
+        time_start,
+        time_end,
     );
 
     //image
