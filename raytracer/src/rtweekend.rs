@@ -9,13 +9,13 @@ pub fn degrees_to_radians(degrees: f64) -> f64 {
     degrees * PI / 180.0
 }
 
-pub fn random_i32() -> i32 {
-    let mut rng = rand::thread_rng();
-    rng.gen::<i32>()
-}
-pub fn random_i32_1(min: i32, max: i32) -> i32 {
-    min + (max - min) * random_i32()
-}
+// pub fn random_i32() -> i32 {
+//     let mut rng = rand::thread_rng();
+//     rng.gen::<i32>()
+// }
+// pub fn random_i32_1(min: i32, max: i32) -> i32 {
+//     min + (max - min) * random_i32()
+// }
 
 pub fn random_f64() -> f64 {
     let mut rng = rand::thread_rng();
