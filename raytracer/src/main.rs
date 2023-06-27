@@ -11,6 +11,7 @@ mod ray;
 mod rtweekend;
 mod texture;
 mod vec3;
+mod perlin;
 
 pub use camera::Camera;
 use color::write_color;
@@ -24,9 +25,9 @@ use object::HitRecord;
 pub use object::Sphere;
 pub use ray::Ray;
 pub use rtweekend::{degrees_to_radians, random_f64, random_f64_1};
-pub use texture::{CheckerTexture, Texture};
+pub use texture::{CheckerTexture, Texture, NoiseTexture};
 pub use vec3::Vec3;
-
+pub use perlin::Perlin;
 use std::fs::File;
 use std::sync::Arc;
 
@@ -149,6 +150,25 @@ fn random_scene() -> HittableList {
     world
 }
 
+fn two_sphere() -> HittableList {
+    let mut objects: HittableList = HittableList::new();
+    let checker:Option<Arc<dyn Texture>> = Some(Arc::new(CheckerTexture::new_2(Vec3::new(0.2, 0.3, 0.1), Vec3::new(0.9, 0.9, 0.9))));
+    objects.add(Some(Arc::new(Sphere::new(&Vec3::new(0.0, -10.0, 0.0), 10.0, Some(Arc::new(Lambertian::new2(&checker)))))));
+    objects.add(Some(Arc::new(Sphere::new(&Vec3::new(0.0, 10.0, 0.0), 10.0, Some(Arc::new(Lambertian::new2(&checker)))))));
+    
+    objects
+
+}
+
+fn two_perlin_spheres() -> HittableList {
+    let mut objects: HittableList = HittableList::new();
+    let pertext:Option<Arc<dyn Texture>> = Some(Arc::new(NoiseTexture::new_0()));
+    objects.add(Some(Arc::new(Sphere::new(&Vec3::new(0.0, -10.0, 0.0), 10.0, Some(Arc::new(Lambertian::new2(&pertext)))))));
+    objects.add(Some(Arc::new(Sphere::new(&Vec3::new(0.0, 10.0, 0.0), 10.0, Some(Arc::new(Lambertian::new2(&pertext)))))));
+    
+    objects
+
+}
 fn is_ci() -> bool {
     option_env!("CI").unwrap_or_default() == "true"
 }
@@ -185,6 +205,7 @@ fn main() {
 
     let mut world = random_scene();
 
+
     // Progress bar UI powered by library `indicatif`
     // You can use indicatif::ProgressStyle to make it more beautiful
     // You can also use indicatif::MultiProgress in multi-threading to show progress of each thread
@@ -195,14 +216,40 @@ fn main() {
     };
 
     //camera
-    let lookfrom = Vec3::new(13.0, 2.0, 3.0);
-    let lookat = Vec3::new(0.0, 0.0, 0.0);
-    let vup = Vec3::new(0.0, 1.0, 0.0);
-    let vfov = 20.0;
     let dist_to_focus = 10.0;
-    let aperture = 0.1;
+    
+    let mut vfov = 40.0;
+    let mut aperture = 0.0;
+
+    let mut lookfrom = Vec3::new(13.0, 2.0, 3.0);
+    let mut lookat = Vec3::new(0.0, 0.0, 0.0);
+    let mut vup = Vec3::new(0.0, 1.0, 0.0);
     let time_start = 0.0;
     let time_end = 1.0;
+
+    match 0 {
+        1 => {
+            lookfrom = Vec3::new(13.0, 2.0, 3.0);
+            lookat = Vec3::new(0.0, 0.0, 0.0);
+            vup = Vec3::new(0.0, 1.0, 0.0);
+            vfov = 20.0;
+            aperture = 0.1;
+        }
+        2 => {
+            world = two_sphere();
+            lookfrom = Vec3::new(13.0, 2.0, 3.0);
+            lookat = Vec3::new(0.0, 0.0, 0.0);
+            vup = Vec3::new(0.0, 1.0, 0.0);
+            vfov = 20.0;
+        }
+        _ => {
+            world = two_perlin_spheres();
+            lookfrom = Vec3::new(13.0, 2.0, 3.0);
+            lookat = Vec3::new(0.0, 0.0, 0.0);
+            vfov = 20.0;
+        }
+    }
+
     let cam: Camera = Camera::new(
         aspect_ratio,
         &lookfrom,
