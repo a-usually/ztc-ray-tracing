@@ -29,7 +29,7 @@ impl SolidColor {
 
 impl Texture for SolidColor {
     fn value(&self, _u: f64, _v: f64, _p: &Vec3) -> Vec3 {
-        self.color_value.clone()
+        self.color_value
     }
 }
 
@@ -82,6 +82,8 @@ impl NoiseTexture {
 impl Texture for NoiseTexture {
     fn value(&self, _u: f64, _v: f64, p: &Vec3) -> Vec3 {
         //Vec3::new(1.0, 1.0, 1.0) * self.noise.turb(&(p.clone() * self.scale), 7)
-        Vec3::new(1.0, 1.0, 1.0) * 0.5 * (1.0 + (self.scale * p.z() + self.noise.turb(p, 7) * 10.0).sin())
+        Vec3::new(1.0, 1.0, 1.0)
+            * 0.5
+            * (1.0 + (self.scale * p.z() + self.noise.turb(p, 7) * 10.0).sin())
     }
 }

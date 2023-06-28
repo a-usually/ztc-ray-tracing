@@ -20,15 +20,15 @@ impl Ray {
     }
 
     pub fn at(&self, t: f64) -> Vec3 {
-        self.ori.clone() + self.direc.clone() * t
+        self.ori + self.direc * t
     }
 
     pub fn ori(&self) -> Vec3 {
-        self.ori.clone()
+        self.ori
     }
 
     pub fn direc(&self) -> Vec3 {
-        self.direc.clone()
+        self.direc
     }
 
     pub fn tm(&self) -> f64 {

@@ -45,9 +45,8 @@ impl MovingSphere {
     }
 
     pub fn center(&self, time: f64) -> Vec3 {
-        self.center0.clone()
-            + (self.center1.clone() - self.center0.clone()) * (time - self.time_0)
-                / (self.time_1 - self.time_0)
+        self.center0
+            + (self.center1 - self.center0) * (time - self.time_0) / (self.time_1 - self.time_0)
     }
 }
 
@@ -55,7 +54,7 @@ impl Hiitable for MovingSphere {
     fn hit(&self, r: &Ray, t_min: f64, t_max: f64, rec: &mut HitRecord) -> bool {
         let oc = r.ori() - self.center(r.tm());
         let a = r.direc().squared_length();
-        let half_b = oc.clone() * r.direc();
+        let half_b = oc * r.direc();
         let c = oc.squared_length() - self.radius * self.radius;
         let discriminant = half_b * half_b - a * c;
         if discriminant < 0.0 {
@@ -74,8 +73,8 @@ impl Hiitable for MovingSphere {
 
         rec.t = root;
         rec.point3 = r.at(rec.t);
-        rec.normal = (rec.point3.clone() - self.center(r.tm())) / self.radius;
-        let outward_normal = (rec.point3.clone() - self.center(r.tm())) / self.radius;
+        rec.normal = (rec.point3 - self.center(r.tm())) / self.radius;
+        let outward_normal = (rec.point3 - self.center(r.tm())) / self.radius;
         rec.set_front_size(r, &outward_normal);
         rec.mat = self.mat.clone();
 

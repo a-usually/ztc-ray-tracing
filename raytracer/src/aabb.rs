@@ -90,10 +90,10 @@ impl AAbb {
     }
 
     pub fn min(&self) -> Vec3 {
-        self.mimimum.clone()
+        self.mimimum
     }
     pub fn max(&self) -> Vec3 {
-        self.maximum.clone()
+        self.maximum
     }
 
     pub fn surrounding_box(box0: &AAbb, box1: &AAbb) -> AAbb {

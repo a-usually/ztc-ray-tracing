@@ -94,16 +94,16 @@ fn random_scene() -> HittableList {
                 b as f64 + 0.9 * random_f64(),
             );
 
-            if (center.clone() - Vec3::new(4.0, 0.2, 0.0)).length() > 0.9 {
+            if (center - Vec3::new(4.0, 0.2, 0.0)).length() > 0.9 {
                 let sphere_material: Option<Arc<dyn Material>>;
                 if choose_mat < 0.8 {
                     //difuse
                     let albedo = Vec3::elemul(&Vec3::random_vec3_1(), &Vec3::random_vec3_1());
                     sphere_material = Some(Arc::new(Lambertian::new1(&albedo)));
-                    let center2 = center.clone() + Vec3::new(0.0, random_f64_1(0.0, 0.5), 0.0);
+                    let center2 = center + Vec3::new(0.0, random_f64_1(0.0, 0.5), 0.0);
                     world.add(Some(Arc::new(MovingSphere::new(
-                        center.clone(),
-                        center2.clone(),
+                        center,
+                        center2,
                         0.0,
                         1.0,
                         0.2,
@@ -197,8 +197,8 @@ fn main() {
     println!("CI: {}", is_ci);
 
     let aspect_ratio = 16.0 / 9.0;
-    let height = 1200;
-    let width = 800;
+    let height = 800;
+    let width = 1200;
     let path = "output/test.jpg";
     let quality = 60; // From 0 to 100, suggested value: 60
     let samples_per_pixel = 666;

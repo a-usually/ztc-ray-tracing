@@ -109,7 +109,7 @@ impl Perlin {
 
     pub fn turb(&self, p: &Vec3, depth: i32) -> f64 {
         let mut accum = 0.0;
-        let mut temp_p = p.clone();
+        let mut temp_p = *p;
         let mut weight = 1.0;
         let mut i = 0;
         while i < depth {

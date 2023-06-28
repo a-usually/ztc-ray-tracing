@@ -34,11 +34,11 @@ impl HitRecord {
         }
     }
     pub fn set_front_size(&mut self, r: &Ray, outward_normal: &Vec3) {
-        self.front_size = r.direc() * outward_normal.clone() < 0.0;
+        self.front_size = r.direc() * *outward_normal < 0.0;
         if self.front_size {
-            self.normal = outward_normal.clone();
+            self.normal = *outward_normal;
         } else {
-            self.normal = -outward_normal.clone();
+            self.normal = -*outward_normal;
         }
     }
 }

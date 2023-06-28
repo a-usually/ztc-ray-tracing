@@ -37,7 +37,7 @@ impl Camera {
         let viewport_height = 2.0 * h;
         let viewport_width = aspect_ratio * viewport_height;
 
-        let w_0 = (lookfrom.clone() - lookat.clone()).unit();
+        let w_0 = (*lookfrom - *lookat).unit();
         let u_0 = Vec3::cross(vup, &w_0).unit();
         let v_0 = Vec3::cross(&w_0, &u_0);
 
@@ -46,13 +46,13 @@ impl Camera {
             // vfov: 0.0,
             // aperture: 0.0,
             // focus_dist: 0.0,
-            origin: lookfrom.clone(),
-            horizontal: u_0.clone() * viewport_width * focus_dist,
-            vertical: v_0.clone() * viewport_height * focus_dist,
-            lower_left_corner: lookfrom.clone()
-                - u_0.clone() * viewport_width * focus_dist / 2.0
-                - v_0.clone() * viewport_height * focus_dist / 2.0
-                - w_0.clone() * focus_dist,
+            origin: *lookfrom,
+            horizontal: u_0 * viewport_width * focus_dist,
+            vertical: v_0 * viewport_height * focus_dist,
+            lower_left_corner: *lookfrom
+                - u_0 * viewport_width * focus_dist / 2.0
+                - v_0 * viewport_height * focus_dist / 2.0
+                - w_0 * focus_dist,
             w: w_0,
             u: u_0,
             v: v_0,
@@ -64,15 +64,11 @@ impl Camera {
 
     pub fn get_ray(&self, s: f64, t: f64) -> Ray {
         let rd = Vec3::random_in_unit_disk() * self.lens_radius;
-        let offest = self.u.clone() * rd.x + self.v.clone() * rd.y;
+        let offest = self.u * rd.x + self.v * rd.y;
 
         Ray::new(
-            self.origin.clone() + offest.clone(),
-            self.lower_left_corner.clone()
-                + self.horizontal.clone() * s
-                + self.vertical.clone() * t
-                - self.origin.clone()
-                - offest,
+            self.origin + offest,
+            self.lower_left_corner + self.horizontal * s + self.vertical * t - self.origin - offest,
             random_f64_1(self.time_0, self.time_1),
         )
     }
