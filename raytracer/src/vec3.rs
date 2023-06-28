@@ -1,7 +1,7 @@
 pub use crate::rtweekend::{random_f64, random_f64_1};
-pub use std::ops::{Add, AddAssign, Div, Index, Mul, Neg, Sub, SubAssign};
+pub use std::ops::{Add, AddAssign, Div, Index, Mul, MulAssign, Neg, Sub, SubAssign};
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Copy)]
 pub struct Vec3 {
     pub x: f64,
     pub y: f64,
@@ -236,6 +236,16 @@ impl Mul<f64> for Vec3 {
     type Output = Self;
     fn mul(self, other: f64) -> Self {
         Self {
+            x: self.x * other,
+            y: self.y * other,
+            z: self.z * other,
+        }
+    }
+}
+
+impl MulAssign<f64> for Vec3 {
+    fn mul_assign(&mut self, other: f64) {
+        *self = Self {
             x: self.x * other,
             y: self.y * other,
             z: self.z * other,
