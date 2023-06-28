@@ -62,9 +62,13 @@ impl Perlin {
     }
 
     pub fn noise(&self, p: &Vec3) -> f64 {
-        let i = (((p.x() * 4.0) as i32) & 255) as usize;
-        let j = (((p.y() * 4.0) as i32) & 255) as usize;
-        let k = (((p.z() * 4.0) as i32) & 255) as usize;
+        let u = p.x() - p.x().floor();
+        let v = p.y() - p.y().floor();
+        let w = p.z() - p.z().floor();
+
+        let i = p.x() as i32;
+        let j = p.y() as i32;
+        let k = p.z() as i32;
 
         self.ranfloat[self.perm_x[i] as usize ^ self.perm_y[j] as usize ^ self.perm_z[k] as usize]
     }
