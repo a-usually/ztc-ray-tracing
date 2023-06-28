@@ -55,7 +55,6 @@ impl Hiitable for Sphere {
 
         rec.t = root;
         rec.point3 = r.at(rec.t);
-        rec.normal = (rec.point3 - self.center) / self.radius;
         let outward_normal = (rec.point3 - self.center) / self.radius;
         rec.set_front_size(r, &outward_normal);
         Sphere::get_sphere_uv(&outward_normal, &mut rec.u, &mut rec.v);

@@ -108,7 +108,7 @@ impl Vec3 {
     }
 
     pub fn near_zero(&self) -> bool {
-        let s: f64 = 1e-8;
+        let s: f64 = 1e-7;
         (self.x < s)
             && (self.x > -s)
             && (self.y < s)
@@ -118,20 +118,20 @@ impl Vec3 {
     }
 
     pub fn reflect(v: &Vec3, n: &Vec3) -> Vec3 {
-        *v - *n * (*v * *n) * 2.0
+        v.clone() - n.clone() * (v.clone() * n.clone()) * 2.0
     }
 
     pub fn refract(uv: &Vec3, n: &Vec3, etai_over_etat: f64) -> Vec3 {
         let cos_theta: f64 = if ((-*uv) * *n) < 1.0 {
-            (-*uv) * *n
+            (-uv.clone()) * n.clone()
         } else {
             1.0
         };
-        let r_out_perp = (*uv + *n * cos_theta) * etai_over_etat;
+        let r_out_perp = (uv.clone() + n.clone() * cos_theta) * etai_over_etat;
         let r_out_parallel = if 1.0 > r_out_perp.squared_length() {
-            *n * (-(1.0 - r_out_perp.squared_length()).sqrt())
+            n.clone() * (-(1.0 - r_out_perp.squared_length()).sqrt())
         } else {
-            *n * (-(r_out_perp.squared_length() - 1.0).sqrt())
+            n.clone() * (-(r_out_perp.squared_length() - 1.0).sqrt())
         };
         r_out_perp + r_out_parallel
     }

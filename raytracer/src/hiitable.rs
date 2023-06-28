@@ -29,7 +29,7 @@ impl HitRecord {
             t: (0.0),
             u: (0.0),
             v: (0.0),
-            front_size: (true),
+            front_size: (false),
             mat: (None),
         }
     }

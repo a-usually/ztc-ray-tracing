@@ -16,6 +16,8 @@ pub trait Material {
         attenuation: &mut Vec3,
         scattered: &mut Ray,
     ) -> bool;
+
+    fn emitted(&self, _u: f64,_v: f64, _p: &Vec3) -> Vec3;
 }
 
 pub struct Lambertian {
@@ -25,7 +27,7 @@ pub struct Lambertian {
 impl Lambertian {
     pub fn new1(a: &Vec3) -> Self {
         Self {
-            albedo: Some(Arc::new(SolidColor::new(*a))),
+            albedo: Some(Arc::new(SolidColor::new(a.clone()))),
         }
     }
 
@@ -42,17 +44,21 @@ impl Material for Lambertian {
         attenuation: &mut Vec3,
         scattered: &mut Ray,
     ) -> bool {
-        let mut scatter_direction = rec.normal + Vec3::random_unit_vector();
+        let mut scatter_direction = rec.normal.clone() + Vec3::random_unit_vector();
         if scatter_direction.near_zero() {
-            scatter_direction = rec.normal;
+            scatter_direction = rec.normal.clone();
         }
-        *scattered = Ray::new(rec.point3, scatter_direction, _r_in.tm());
+        *scattered = Ray::new(rec.point3.clone(), scatter_direction, _r_in.tm());
         *attenuation = self
             .albedo
             .clone()
             .unwrap()
             .value(rec.u, rec.v, &rec.point3);
         true
+    }
+
+    fn emitted(&self, _u: f64,_v: f64, _p: &Vec3) -> Vec3 {
+        Vec3::new(0.0, 0.0, 0.0)
     }
 }
 
@@ -69,7 +75,7 @@ impl Metal {
             b = num;
         }
         Self {
-            albedo: *a,
+            albedo: a.clone(),
             fuzz: b,
         }
     }
@@ -86,13 +92,17 @@ impl Material for Metal {
         let reflected = Vec3::reflect(&r_in.direc().unit(), &rec.normal.clone());
 
         *scattered = Ray::new(
-            rec.point3,
+            rec.point3.clone(),
             reflected + Vec3::random_in_unit_sphere() * self.fuzz,
             r_in.tm,
         );
-        *attenuation = self.albedo;
+        *attenuation = self.albedo.clone();
 
-        (scattered.direc() * rec.normal) > 0.0
+        (scattered.direc() * rec.normal.clone()) > 0.0
+    }
+
+    fn emitted(&self, _u: f64,_v: f64, _p: &Vec3) -> Vec3 {
+        Vec3::new(0.0, 0.0, 0.0)
     }
 }
 
@@ -132,8 +142,8 @@ impl Material for Dielectric {
 
         let unit_direction = r_in.direc.unit();
 
-        let cos_theta: f64 = if ((-unit_direction) * rec.normal) < 1.0 {
-            (-unit_direction) * rec.normal
+        let cos_theta: f64 = if ((-unit_direction.clone()) * rec.normal.clone()) < 1.0 {
+            (-unit_direction.clone()) * rec.normal.clone()
         } else {
             1.0
         };
@@ -148,8 +158,46 @@ impl Material for Dielectric {
             Vec3::refract(&unit_direction, &rec.normal, refraction_ratio)
         };
 
-        *scattered = Ray::new(rec.point3, direction, r_in.tm);
+        *scattered = Ray::new(rec.point3.clone(), direction, r_in.tm);
 
         true
+    }
+
+    fn emitted(&self, _u: f64,_v: f64, _p: &Vec3) -> Vec3 {
+        Vec3::new(0.0, 0.0, 0.0)
+    }
+}
+
+pub struct DiffuseLight {
+    emit: Option<Arc<dyn Texture>>,
+}
+
+impl DiffuseLight {
+    pub fn new1(a: Option<Arc<dyn Texture>>) -> Self {
+        Self {
+            emit: a,
+        }
+    }
+
+    pub fn new2(c: Vec3) -> Self {
+        Self{
+            emit: Some(Arc::new(SolidColor::new(c)))
+        }
+    }
+}
+
+impl Material for DiffuseLight {
+    fn scatter(
+            &self,
+            _r_in: &Ray,
+            _rec: &mut HitRecord,
+            _attenuation: &mut Vec3,
+            _scattered: &mut Ray,
+        ) -> bool {
+        false
+    }
+
+    fn emitted(&self, u: f64,v: f64, p: &Vec3) -> Vec3 {
+        self.emit.clone().unwrap().value(u, v, p)
     }
 }

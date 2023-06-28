@@ -12,6 +12,7 @@ mod ray;
 mod rtweekend;
 mod texture;
 mod vec3;
+mod aarect;
 
 pub use camera::Camera;
 use color::write_color;
@@ -19,7 +20,7 @@ pub use hiitable::Hiitable;
 pub use hittable_list::HittableList;
 use image::{ImageBuffer, RgbImage};
 use indicatif::ProgressBar;
-pub use material::{Lambertian, Material, Metal};
+pub use material::{Lambertian, Material, Metal, Dielectric, DiffuseLight};
 pub use moving_sphere::MovingSphere;
 use object::HitRecord;
 pub use object::Sphere;
@@ -30,46 +31,45 @@ use std::fs::File;
 use std::sync::Arc;
 pub use texture::{CheckerTexture, ImageTexture, NoiseTexture, Texture};
 pub use vec3::Vec3;
-
-use crate::material::Dielectric;
+pub use crate::aarect::Xyrect;
 
 const AUTHOR: &str = "Zhang Tongcheng";
 const INFINITY: f64 = f64::INFINITY;
 
-fn ray_color(r: &Ray, world: &mut HittableList, depth: i32) -> Vec3 {
+fn ray_color(r: &Ray, background: &Vec3, world: &mut HittableList, depth: i32) -> Vec3 {
     let mut rec: HitRecord = HitRecord::new();
     if depth <= 0 {
         return Vec3::new(0.0, 0.0, 0.0);
     }
-    if world.hit(r, 0.001, INFINITY, &mut rec) {
-        let mut scattered: Ray = Ray::new(
-            Vec3::new(0.0, 0.0, 0.0),
-            Vec3::new(0.0, 0.0, 0.0),
-            random_f64_1(0.0, 1.0),
-        );
-        let mut attenuation: Vec3 = Vec3::new(0.0, 0.0, 0.0);
-        if rec
-            .mat
-            .clone()
-            .unwrap()
-            .scatter(r, &mut rec, &mut attenuation, &mut scattered)
-        {
-            return Vec3::elemul(&attenuation, &ray_color(&scattered, world, depth - 1));
-        }
-        Vec3::new(0.0, 0.0, 0.0)
-    } else {
-        let unit_direction = r.direc.unit();
-        let t = 0.5 * (unit_direction.y() + 1.0);
-
-        let tmp1 = Vec3::new(1.0, 1.0, 1.0);
-        let tmp2 = Vec3::new(0.5, 0.7, 1.0);
-
-        let x1 = tmp1.x * (1.0 - t) + tmp2.x * t;
-        let y1 = tmp1.y * (1.0 - t) + tmp2.y * t;
-        let z1 = tmp1.z * (1.0 - t) + tmp2.z * t;
-        //println!("tmp={}{}{}", tmp[0], tmp[1], tmp[2]);
-        Vec3::new(x1, y1, z1)
+    if !world.hit(r, 0.001, INFINITY, &mut rec) {
+        return background.clone();
     }
+    let mut scattered = Ray::new(Vec3::new(0.0,0.0,0.0), Vec3::new(0.0, 0.0, 0.0), 0.0);
+    let attenuation = Vec3::new(0.0, 0.0, 0.0);
+    let emitter = rec.mat.clone().unwrap().emitted(rec.u, rec.v, &rec.point3);
+    if !rec
+        .mat
+        .clone()
+        .unwrap()
+        .scatter(r, &mut rec, &mut attenuation.clone(), &mut scattered)
+    {
+        return emitter;
+    }
+    
+    emitter + Vec3::elemul(&attenuation, &ray_color(&scattered, &background, &mut world.clone(), depth - 1))
+    // } else {
+    //     let unit_direction = r.direc.unit();
+    //     let t = 0.5 * (unit_direction.y() + 1.0);
+
+    //     let tmp1 = Vec3::new(1.0, 1.0, 1.0);
+    //     let tmp2 = Vec3::new(0.5, 0.7, 1.0);
+
+    //     let x1 = tmp1.x * (1.0 - t) + tmp2.x * t;
+    //     let y1 = tmp1.y * (1.0 - t) + tmp2.y * t;
+    //     let z1 = tmp1.z * (1.0 - t) + tmp2.z * t;
+    //     //println!("tmp={}{}{}", tmp[0], tmp[1], tmp[2]);
+    //     Vec3::new(x1, y1, z1)
+    // }
 }
 
 fn random_scene() -> HittableList {
@@ -199,6 +199,18 @@ fn earth() -> HittableList {
     world_0.add(globe);
     world_0
 }
+
+fn simple_silght() -> HittableList {
+    let mut objects: HittableList = HittableList::new();
+    let pertext: Option<Arc<dyn Texture>> = Some(Arc::new(NoiseTexture::new_0(4.0)));
+    objects.add(Some(Arc::new(Sphere::new(&Vec3::new(0.0, -1000.0, 0.0), 1000.0, Some(Arc::new(Lambertian::new2(&pertext)))))));
+    objects.add(Some(Arc::new(Sphere::new(&Vec3::new(0.0, 2.0, 0.0), 2.0, Some(Arc::new(Lambertian::new2(&pertext)))))));
+    
+    let difflight: Option<Arc<dyn Material>> = Some(Arc::new(DiffuseLight::new2(Vec3::new(4.0, 4.0, 4.0))));
+    objects.add(Some(Arc::new(Xyrect::new(3.0, 5.0, 1.0, 3.0, -2.0, difflight))));
+
+    objects
+}
 fn is_ci() -> bool {
     option_env!("CI").unwrap_or_default() == "true"
 }
@@ -214,8 +226,8 @@ fn main() {
     let width = 1200;
     let path = "output/test.jpg";
     let quality = 60; // From 0 to 100, suggested value: 60
-    let samples_per_pixel = 666;
-    let max_depth = 66;
+    let samples_per_pixel = 5;
+    let max_depth = 20;
 
     // Create image data
     let mut img: RgbImage = ImageBuffer::new(width.try_into().unwrap(), height.try_into().unwrap());
@@ -233,7 +245,7 @@ fn main() {
     // world.add(Some(Arc::new(Sphere::new(&Vec3::new(-1.0, 0.0, -1.0),0.5,material_left))));
     // world.add(Some(Arc::new(Sphere::new(&Vec3::new(1.0, 0.0, -1.0),0.5,material_right))));
 
-    let mut world = random_scene();
+    let mut world;
 
     // Progress bar UI powered by library `indicatif`
     // You can use indicatif::ProgressStyle to make it more beautiful
@@ -253,11 +265,14 @@ fn main() {
     let lookfrom: Vec3;
     let lookat: Vec3;
     let mut vup = Vec3::new(0.0, 1.0, 0.0);
+    let mut background: Vec3;
     let time_start = 0.0;
     let time_end = 1.0;
 
     match 0 {
         1 => {
+            world = random_scene();
+            background = Vec3::new(0.7, 0.8, 1.0);
             lookfrom = Vec3::new(13.0, 2.0, 3.0);
             lookat = Vec3::new(0.0, 0.0, 0.0);
             vup = Vec3::new(0.0, 1.0, 0.0);
@@ -266,6 +281,7 @@ fn main() {
         }
         2 => {
             world = two_sphere();
+            background = Vec3::new(0.7, 0.8, 1.0);
             lookfrom = Vec3::new(13.0, 2.0, 3.0);
             lookat = Vec3::new(0.0, 0.0, 0.0);
             vup = Vec3::new(0.0, 1.0, 0.0);
@@ -273,14 +289,29 @@ fn main() {
         }
         3 => {
             world = two_perlin_spheres();
+            background = Vec3::new(0.7, 0.8, 1.0);
             lookfrom = Vec3::new(13.0, 2.0, 3.0);
             lookat = Vec3::new(0.0, 0.0, 0.0);
             vfov = 20.0;
         }
-        _ => {
+        4 => {
             world = earth();
+            background = Vec3::new(0.7, 0.8, 1.0);
             lookfrom = Vec3::new(13.0, 2.0, 3.0);
             lookat = Vec3::new(0.0, 0.0, 0.0);
+            vfov = 20.0;
+        }
+        // 5 => {
+        //     lookfrom = Vec3::new(0.0, 0.0, 0.0);
+        //     lookat = Vec3::new(0.0, 0.0, 0.0);
+        //     vfov = 20.0;
+        //     background = Vec3::new(0.0, 0.0, 0.0);
+        // }
+        _ => {
+            world = simple_silght();
+            background = Vec3::new(0.0, 0.0, 0.0);
+            lookfrom = Vec3::new(26.0, 3.0, 6.0);
+            lookat = Vec3::new(0.0, 2.0, 0.0);
             vfov = 20.0;
         }
     }
@@ -303,7 +334,7 @@ fn main() {
                 let u = ((i as f64) + random_f64()) / (width as f64 - 1.0);
                 let v = ((j as f64) + random_f64()) / (height as f64 - 1.0);
                 let r = cam.get_ray(u, v);
-                let tmp = ray_color(&r, &mut world, max_depth); //[0-1]
+                let tmp = ray_color(&r, &mut background, &mut world, max_depth); //[0-1]
                 pixel_color.x += tmp.x;
                 pixel_color.y += tmp.y;
                 pixel_color.z += tmp.z;

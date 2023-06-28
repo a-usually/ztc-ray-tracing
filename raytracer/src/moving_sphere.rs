@@ -73,7 +73,6 @@ impl Hiitable for MovingSphere {
 
         rec.t = root;
         rec.point3 = r.at(rec.t);
-        rec.normal = (rec.point3 - self.center(r.tm())) / self.radius;
         let outward_normal = (rec.point3 - self.center(r.tm())) / self.radius;
         rec.set_front_size(r, &outward_normal);
         rec.mat = self.mat.clone();
