@@ -51,7 +51,7 @@ impl Material for Lambertian {
             .albedo
             .clone()
             .unwrap()
-            .value(rec.u, rec.v, &mut rec.point3);
+            .value(rec.u, rec.v, &rec.point3);
         true
     }
 }

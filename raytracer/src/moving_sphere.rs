@@ -84,31 +84,31 @@ impl Hiitable for MovingSphere {
 
     fn bounding_box(&self, time0: f64, time1: f64, output_box: &mut AAbb) -> bool {
         let box0 = AAbb::new(
-            self.center(time0.clone())
+            self.center(time0)
                 - Vec3::new(
-                    self.radius.clone(),
-                    self.radius.clone(),
-                    self.radius.clone(),
+                    self.radius,
+                    self.radius,
+                    self.radius,
                 ),
-            self.center(time0.clone())
+            self.center(time0)
                 + Vec3::new(
-                    self.radius.clone(),
-                    self.radius.clone(),
-                    self.radius.clone(),
+                    self.radius,
+                    self.radius,
+                    self.radius,
                 ),
         );
         let box1 = AAbb::new(
-            self.center(time1.clone())
+            self.center(time1)
                 - Vec3::new(
-                    self.radius.clone(),
-                    self.radius.clone(),
-                    self.radius.clone(),
+                    self.radius,
+                    self.radius,
+                    self.radius,
                 ),
-            self.center(time1.clone())
+            self.center(time1)
                 + Vec3::new(
-                    self.radius.clone(),
-                    self.radius.clone(),
-                    self.radius.clone(),
+                    self.radius,
+                    self.radius,
+                    self.radius,
                 ),
         );
         *output_box = AAbb::surrounding_box(&box0, &box1);

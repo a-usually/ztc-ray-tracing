@@ -25,10 +25,10 @@ impl Sphere {
 
     pub fn get_sphere_uv(p: &Vec3, u: &mut f64, v: &mut f64) {
         let theta = (-p.y()).acos();
-        let phi = (-p.z()).atan2(p.x()) + (PI as f64);
+        let phi = (-p.z()).atan2(p.x()) + PI;
 
-        *u = phi / (2.0 * (PI as f64));
-        *v = theta / (PI as f64);
+        *u = phi / (2.0 * PI);
+        *v = theta / PI;
     }
 }
 
@@ -68,15 +68,15 @@ impl Hiitable for Sphere {
         *output_box = AAbb::new(
             self.center.clone()
                 - Vec3::new(
-                    self.radius.clone(),
-                    self.radius.clone(),
-                    self.radius.clone(),
+                    self.radius,
+                    self.radius,
+                    self.radius,
                 ),
             self.center.clone()
                 + Vec3::new(
-                    self.radius.clone(),
-                    self.radius.clone(),
-                    self.radius.clone(),
+                    self.radius,
+                    self.radius,
+                    self.radius,
                 ),
         );
         true

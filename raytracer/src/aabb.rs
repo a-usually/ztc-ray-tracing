@@ -28,20 +28,18 @@ impl AAbb {
                 let invd = 1.0 / r.direc().x();
                 let mut t0 = fmin(
                     (self.mimimum.x() - r.ori.x()) / r.direc().x,
-                    (self.maximum.x() - r.ori().x()) * invd.clone(),
+                    (self.maximum.x() - r.ori().x()) * invd,
                 );
                 let mut t1 = fmax(
                     (self.mimimum.x() - r.ori.x()) / r.direc().x,
-                    (self.maximum.x() - r.ori().x()) * invd.clone(),
+                    (self.maximum.x() - r.ori().x()) * invd,
                 );
 
                 if invd < 0.0 {
-                    let tmp = t1;
-                    t1 = t0;
-                    t0 = tmp;
+                    std::mem::swap(&mut t1, &mut t0);
                 }
 
-                let t_min_0 = fmax(t0, t_min.clone());
+                let t_min_0 = fmax(t0, t_min);
                 let t_max_0 = fmin(t1, t_max);
                 if t_max_0 <= t_min_0 {
                     return false;
@@ -50,17 +48,15 @@ impl AAbb {
                 let invd = 1.0 / r.direc().y();
                 let mut t0 = fmin(
                     (self.mimimum.y() - r.ori.y()) / r.direc().y,
-                    (self.maximum.y() - r.ori().y()) * invd.clone(),
+                    (self.maximum.y() - r.ori().y()) * invd,
                 );
                 let mut t1 = fmax(
                     (self.mimimum.y() - r.ori.y()) / r.direc().y,
-                    (self.maximum.y() - r.ori().y()) * invd.clone(),
+                    (self.maximum.y() - r.ori().y()) * invd,
                 );
 
                 if invd < 0.0 {
-                    let tmp = t1;
-                    t1 = t0;
-                    t0 = tmp;
+                    std::mem::swap(&mut t1, &mut t0);
                 }
 
                 let t_min_0 = fmax(t0, t_min);
@@ -72,17 +68,15 @@ impl AAbb {
                 let invd = 1.0 / r.direc().z();
                 let mut t0 = fmin(
                     (self.mimimum.z() - r.ori.z()) / r.direc().z,
-                    (self.maximum.z() - r.ori().z()) * invd.clone(),
+                    (self.maximum.z() - r.ori().z()) * invd,
                 );
                 let mut t1 = fmax(
                     (self.mimimum.z() - r.ori.z()) / r.direc().z,
-                    (self.maximum.z() - r.ori().z()) * invd.clone(),
+                    (self.maximum.z() - r.ori().z()) * invd,
                 );
 
                 if invd < 0.0 {
-                    let tmp = t1;
-                    t1 = t0;
-                    t0 = tmp;
+                    std::mem::swap(&mut t1, &mut t0);
                 }
 
                 let t_min_0 = fmax(t0, t_min);

@@ -32,6 +32,6 @@ impl Ray {
     }
 
     pub fn tm(&self) -> f64 {
-        self.tm.clone()
+        self.tm
     }
 }

@@ -218,11 +218,11 @@ fn main() {
     //camera
     let dist_to_focus = 10.0;
     
-    let mut vfov = 40.0;
+    let vfov:f64;
     let mut aperture = 0.0;
 
-    let mut lookfrom = Vec3::new(13.0, 2.0, 3.0);
-    let mut lookat = Vec3::new(0.0, 0.0, 0.0);
+    let lookfrom: Vec3;
+    let lookat: Vec3;
     let mut vup = Vec3::new(0.0, 1.0, 0.0);
     let time_start = 0.0;
     let time_end = 1.0;
@@ -257,9 +257,7 @@ fn main() {
         &vup,
         vfov,
         aperture,
-        dist_to_focus,
-        time_start,
-        time_end,
+        (dist_to_focus,time_start,time_end)
     );
 
     //image

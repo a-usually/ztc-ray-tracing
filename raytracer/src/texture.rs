@@ -12,21 +12,21 @@ pub struct SolidColor {
 }
 
 impl SolidColor {
-    pub fn new_0() -> Self {
-        Self {
-            color_value: Vec3::new(0.0, 0.0, 0.0),
-        }
-    }
+    // pub fn new_0() -> Self {
+    //     Self {
+    //         color_value: Vec3::new(0.0, 0.0, 0.0),
+    //     }
+    // }
 
     pub fn new(c: Vec3) -> Self {
         Self {
-            color_value: c.clone(),
+            color_value: c,
         }
     }
 
-    pub fn color_value(&self) -> Vec3 {
-        self.color_value.clone()
-    }
+    // pub fn color_value(&self) -> Vec3 {
+    //     self.color_value.clone()
+    // }
 }
 
 impl Texture for SolidColor {
@@ -80,7 +80,7 @@ impl NoiseTexture {
 }
 
 impl Texture for NoiseTexture {
-    fn value(&self, u: f64, v: f64, p: &Vec3) -> Vec3 {
+    fn value(&self, _u: f64, _v: f64, p: &Vec3) -> Vec3 {
         Vec3::new(1.0, 1.0, 1.0) * self.noise.noise(p)
     }
 }
