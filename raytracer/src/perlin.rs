@@ -1,9 +1,9 @@
-use crate::rtweekend::{random_i32_1,random_f64};
+use crate::rtweekend::{random_f64, random_i32_1};
 pub use crate::vec3::Vec3;
 
 use std::vec::Vec;
 pub struct Perlin {
-   // point_count: i32,
+    // point_count: i32,
     ranfloat: Vec<f64>,
     perm_x: Vec<i32>,
     perm_y: Vec<i32>,
@@ -21,9 +21,9 @@ impl Perlin {
         Self {
             //point_count: 256,
             ranfloat: vec![0.0; 0],
-            perm_x: vec![0;0],
-            perm_y: vec![0;0],
-            perm_z: vec![0;0],
+            perm_x: vec![0; 0],
+            perm_y: vec![0; 0],
+            perm_z: vec![0; 0],
         }
     }
     pub fn new() -> Self {
@@ -65,8 +65,7 @@ impl Perlin {
         let i = (((p.x() * 4.0) as i32) & 255) as usize;
         let j = (((p.y() * 4.0) as i32) & 255) as usize;
         let k = (((p.z() * 4.0) as i32) & 255) as usize;
-        
-        self.ranfloat[self.perm_x[i] as usize ^ self.perm_y[j] as usize ^ self.perm_z[k] as usize] 
+
+        self.ranfloat[self.perm_x[i] as usize ^ self.perm_y[j] as usize ^ self.perm_z[k] as usize]
     }
 }
-

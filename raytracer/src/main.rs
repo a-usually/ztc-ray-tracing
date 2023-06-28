@@ -7,11 +7,11 @@ mod hittable_list;
 mod material;
 mod moving_sphere;
 mod object;
+mod perlin;
 mod ray;
 mod rtweekend;
 mod texture;
 mod vec3;
-mod perlin;
 
 pub use camera::Camera;
 use color::write_color;
@@ -23,13 +23,13 @@ pub use material::{Lambertian, Material, Metal};
 pub use moving_sphere::MovingSphere;
 use object::HitRecord;
 pub use object::Sphere;
+pub use perlin::Perlin;
 pub use ray::Ray;
 pub use rtweekend::{degrees_to_radians, random_f64, random_f64_1};
-pub use texture::{CheckerTexture, Texture, NoiseTexture};
-pub use vec3::Vec3;
-pub use perlin::Perlin;
 use std::fs::File;
 use std::sync::Arc;
+pub use texture::{CheckerTexture, NoiseTexture, Texture};
+pub use vec3::Vec3;
 
 use crate::material::Dielectric;
 
@@ -152,22 +152,39 @@ fn random_scene() -> HittableList {
 
 fn two_sphere() -> HittableList {
     let mut objects: HittableList = HittableList::new();
-    let checker:Option<Arc<dyn Texture>> = Some(Arc::new(CheckerTexture::new_2(Vec3::new(0.2, 0.3, 0.1), Vec3::new(0.9, 0.9, 0.9))));
-    objects.add(Some(Arc::new(Sphere::new(&Vec3::new(0.0, -10.0, 0.0), 10.0, Some(Arc::new(Lambertian::new2(&checker)))))));
-    objects.add(Some(Arc::new(Sphere::new(&Vec3::new(0.0, 10.0, 0.0), 10.0, Some(Arc::new(Lambertian::new2(&checker)))))));
-    
-    objects
+    let checker: Option<Arc<dyn Texture>> = Some(Arc::new(CheckerTexture::new_2(
+        Vec3::new(0.2, 0.3, 0.1),
+        Vec3::new(0.9, 0.9, 0.9),
+    )));
+    objects.add(Some(Arc::new(Sphere::new(
+        &Vec3::new(0.0, -10.0, 0.0),
+        10.0,
+        Some(Arc::new(Lambertian::new2(&checker))),
+    ))));
+    objects.add(Some(Arc::new(Sphere::new(
+        &Vec3::new(0.0, 10.0, 0.0),
+        10.0,
+        Some(Arc::new(Lambertian::new2(&checker))),
+    ))));
 
+    objects
 }
 
 fn two_perlin_spheres() -> HittableList {
     let mut objects: HittableList = HittableList::new();
-    let pertext:Option<Arc<dyn Texture>> = Some(Arc::new(NoiseTexture::new_0()));
-    objects.add(Some(Arc::new(Sphere::new(&Vec3::new(0.0, -1000.0, 0.0), 1000.0, Some(Arc::new(Lambertian::new2(&pertext)))))));
-    objects.add(Some(Arc::new(Sphere::new(&Vec3::new(0.0, 2.0, 0.0), 2.0, Some(Arc::new(Lambertian::new2(&pertext)))))));
-    
-    objects
+    let pertext: Option<Arc<dyn Texture>> = Some(Arc::new(NoiseTexture::new_0()));
+    objects.add(Some(Arc::new(Sphere::new(
+        &Vec3::new(0.0, -1000.0, 0.0),
+        1000.0,
+        Some(Arc::new(Lambertian::new2(&pertext))),
+    ))));
+    objects.add(Some(Arc::new(Sphere::new(
+        &Vec3::new(0.0, 2.0, 0.0),
+        2.0,
+        Some(Arc::new(Lambertian::new2(&pertext))),
+    ))));
 
+    objects
 }
 fn is_ci() -> bool {
     option_env!("CI").unwrap_or_default() == "true"
@@ -184,8 +201,8 @@ fn main() {
     let width = 400;
     let path = "output/test.jpg";
     let quality = 60; // From 0 to 100, suggested value: 60
-    let samples_per_pixel = 510;
-    let max_depth = 50;
+    let samples_per_pixel = 800;
+    let max_depth = 70;
 
     // Create image data
     let mut img: RgbImage = ImageBuffer::new(width.try_into().unwrap(), height.try_into().unwrap());
@@ -205,7 +222,6 @@ fn main() {
 
     let mut world = random_scene();
 
-
     // Progress bar UI powered by library `indicatif`
     // You can use indicatif::ProgressStyle to make it more beautiful
     // You can also use indicatif::MultiProgress in multi-threading to show progress of each thread
@@ -217,8 +233,8 @@ fn main() {
 
     //camera
     let dist_to_focus = 10.0;
-    
-    let vfov:f64;
+
+    let vfov: f64;
     let mut aperture = 0.0;
 
     let lookfrom: Vec3;
@@ -257,7 +273,7 @@ fn main() {
         &vup,
         vfov,
         aperture,
-        (dist_to_focus,time_start,time_end)
+        (dist_to_focus, time_start, time_end),
     );
 
     //image

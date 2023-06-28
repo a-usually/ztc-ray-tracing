@@ -146,10 +146,7 @@ impl Hiitable for BvhNode {
                 .unwrap()
                 .hit(r, t_min, rec.clone().t, rec)
         } else {
-            self.right
-                .clone()
-                .unwrap()
-                .hit(r, t_min, t_max, rec)
+            self.right.clone().unwrap().hit(r, t_min, t_max, rec)
         };
 
         hit_left || hit_right

@@ -1,5 +1,5 @@
-pub use crate::vec3::Vec3;
 pub use crate::perlin::Perlin;
+pub use crate::vec3::Vec3;
 
 use std::sync::Arc;
 pub trait Texture {
@@ -19,9 +19,7 @@ impl SolidColor {
     // }
 
     pub fn new(c: Vec3) -> Self {
-        Self {
-            color_value: c,
-        }
+        Self { color_value: c }
     }
 
     // pub fn color_value(&self) -> Vec3 {
