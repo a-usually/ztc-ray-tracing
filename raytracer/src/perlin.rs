@@ -20,28 +20,30 @@ impl Perlin {
             perm_z: vec![0;0],
         }
     }
-    pub fn new(&self) -> Self {
-        let mut ranfloat_0: Vec<f64> = vec![0.0; self.point_count as usize];
-        for i in 0..self.point_count.clone() {
+    pub fn new() -> Self {
+        let point_count_0 = 256;
+        let mut ranfloat_0: Vec<f64> = vec![0.0; point_count_0 as usize];
+        for i in 0..point_count_0.clone() {
             ranfloat_0[i as usize] = random_f64();
         }
         Self {
-            point_count: 256,
+            point_count: point_count_0,
             ranfloat: ranfloat_0,
-            perm_x: self.perlin_generate_perm(),
-            perm_y: self.perlin_generate_perm(),
-            perm_z: self.perlin_generate_perm(),
+            perm_x: Perlin::perlin_generate_perm(),
+            perm_y: Perlin::perlin_generate_perm(),
+            perm_z: Perlin::perlin_generate_perm(),
         }
     }
 
-    pub fn perlin_generate_perm(&self) -> Vec<i32> {
-        let mut p = vec![0; self.point_count as usize];
+    pub fn perlin_generate_perm() -> Vec<i32> {
+        let point_count_0 = 256;
+        let mut p = vec![0; point_count_0 as usize];
 
-        for i in 0..self.point_count.clone() {
+        for i in 0..point_count_0.clone() {
             p[i as usize] = i;
         }
 
-        Perlin::permute(&mut p, self.point_count);
+        Perlin::permute(&mut p, point_count_0);
 
         p
     }
@@ -55,7 +57,7 @@ impl Perlin {
         }
     }
 
-    pub fn noise(&self, p: &Vec3) -> f64{
+    pub fn noise(&self, p: &Vec3) -> f64 {
         let i = (((p.x() * 4.0) as i32) & 255) as usize;
         let j = (((p.y() * 4.0) as i32) & 255) as usize;
         let k = (((p.z() * 4.0) as i32) & 255) as usize;

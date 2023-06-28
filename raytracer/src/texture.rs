@@ -74,7 +74,7 @@ pub struct NoiseTexture {
 impl NoiseTexture {
     pub fn new_0() -> Self {
         Self {
-            noise: Perlin::new_0(),
+            noise: Perlin::new(),
         }
     }
 }

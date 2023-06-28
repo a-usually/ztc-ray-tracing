@@ -14,7 +14,8 @@ pub fn random_i32() -> i32 {
     rng.gen::<i32>()
 }
 pub fn random_i32_1(min: i32, max: i32) -> i32 {
-    min + (max - min) * random_i32()
+    let mut rng = rand::thread_rng();
+    rng.gen_range(min..max)
 }
 
 pub fn random_f64() -> f64 {
