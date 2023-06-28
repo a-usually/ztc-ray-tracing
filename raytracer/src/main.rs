@@ -20,7 +20,7 @@ pub use hiitable::Hiitable;
 pub use hittable_list::HittableList;
 use image::{ImageBuffer, RgbImage};
 use indicatif::ProgressBar;
-pub use material::{Lambertian, Material, Metal, Dielectric, DiffuseLight};
+pub use material::{Lambertian, Material, Metal, Dielectric, DiffLight};
 pub use moving_sphere::MovingSphere;
 use object::HitRecord;
 pub use object::Sphere;
@@ -44,18 +44,18 @@ fn ray_color(r: &Ray, background: &Vec3, world: &mut HittableList, depth: i32) -
     if !world.hit(r, 0.001, INFINITY, &mut rec) {
         return background.clone();
     }
-    let mut scattered = Ray::new(Vec3::new(0.0,0.0,0.0), Vec3::new(0.0, 0.0, 0.0), 0.0);
-    let attenuation = Vec3::new(0.0, 0.0, 0.0);
+    let mut scattered = Ray::new(Vec3::new(0.0,0.0,0.0), Vec3::new(0.0, 0.0, 0.0), random_f64_1(0.0, 1.0));
+    let mut attenuation = Vec3::new(0.0, 0.0, 0.0);
     let emitter = rec.mat.clone().unwrap().emitted(rec.u, rec.v, &rec.point3);
     if !rec
         .mat
         .clone()
         .unwrap()
-        .scatter(r, &mut rec, &mut attenuation.clone(), &mut scattered)
+        .scatter(r, &mut rec, &mut attenuation, &mut scattered)
     {
         return emitter;
     }
-    //println!("{}",depth);
+    //println!("x:{}",attenuation.x());
     emitter + Vec3::elemul(&attenuation, &ray_color(&scattered, &background, &mut world.clone(), depth - 1))
     // } else {
     //     let unit_direction = r.direc.unit();
@@ -206,7 +206,7 @@ fn simple_silght() -> HittableList {
     objects.add(Some(Arc::new(Sphere::new(&Vec3::new(0.0, -1000.0, 0.0), 1000.0, Some(Arc::new(Lambertian::new2(&pertext.clone())))))));
     objects.add(Some(Arc::new(Sphere::new(&Vec3::new(0.0, 2.0, 0.0), 2.0, Some(Arc::new(Lambertian::new2(&pertext.clone())))))));
     
-    let difflight: Option<Arc<dyn Material>> = Some(Arc::new(DiffuseLight::new2(Vec3::new(4.0, 4.0, 4.0))));
+    let difflight: Option<Arc<dyn Material>> = Some(Arc::new(DiffLight::new2(Vec3::new(4.0, 4.0, 4.0))));
     objects.add(Some(Arc::new(Xyrect::new(3.0, 5.0, 1.0, 3.0, -2.0, difflight))));
 
     objects
@@ -309,7 +309,7 @@ fn main() {
         // }
         _ => {
             world = simple_silght();
-            background = Vec3::new(1.0, 1.0, 1.0);
+            background = Vec3::new(0.0, 0.0, 0.0);
             lookfrom = Vec3::new(26.0, 3.0, 6.0);
             lookat = Vec3::new(0.0, 2.0, 0.0);
             vfov = 20.0;

@@ -168,11 +168,11 @@ impl Material for Dielectric {
     }
 }
 
-pub struct DiffuseLight {
+pub struct DiffLight {
     emit: Option<Arc<dyn Texture>>,
 }
 
-impl DiffuseLight {
+impl DiffLight {
     pub fn new1(a: Option<Arc<dyn Texture>>) -> Self {
         Self {
             emit: a,
@@ -186,7 +186,7 @@ impl DiffuseLight {
     }
 }
 
-impl Material for DiffuseLight {
+impl Material for DiffLight {
     fn scatter(
             &self,
             _r_in: &Ray,
