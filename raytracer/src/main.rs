@@ -55,7 +55,7 @@ fn ray_color(r: &Ray, background: &Vec3, world: &mut HittableList, depth: i32) -
     {
         return emitter;
     }
-    
+    //println!("{}",depth);
     emitter + Vec3::elemul(&attenuation, &ray_color(&scattered, &background, &mut world.clone(), depth - 1))
     // } else {
     //     let unit_direction = r.direc.unit();
@@ -203,8 +203,8 @@ fn earth() -> HittableList {
 fn simple_silght() -> HittableList {
     let mut objects: HittableList = HittableList::new();
     let pertext: Option<Arc<dyn Texture>> = Some(Arc::new(NoiseTexture::new_0(4.0)));
-    objects.add(Some(Arc::new(Sphere::new(&Vec3::new(0.0, -1000.0, 0.0), 1000.0, Some(Arc::new(Lambertian::new2(&pertext)))))));
-    objects.add(Some(Arc::new(Sphere::new(&Vec3::new(0.0, 2.0, 0.0), 2.0, Some(Arc::new(Lambertian::new2(&pertext)))))));
+    objects.add(Some(Arc::new(Sphere::new(&Vec3::new(0.0, -1000.0, 0.0), 1000.0, Some(Arc::new(Lambertian::new2(&pertext.clone())))))));
+    objects.add(Some(Arc::new(Sphere::new(&Vec3::new(0.0, 2.0, 0.0), 2.0, Some(Arc::new(Lambertian::new2(&pertext.clone())))))));
     
     let difflight: Option<Arc<dyn Material>> = Some(Arc::new(DiffuseLight::new2(Vec3::new(4.0, 4.0, 4.0))));
     objects.add(Some(Arc::new(Xyrect::new(3.0, 5.0, 1.0, 3.0, -2.0, difflight))));
@@ -309,7 +309,7 @@ fn main() {
         // }
         _ => {
             world = simple_silght();
-            background = Vec3::new(0.0, 0.0, 0.0);
+            background = Vec3::new(1.0, 1.0, 1.0);
             lookfrom = Vec3::new(26.0, 3.0, 6.0);
             lookat = Vec3::new(0.0, 2.0, 0.0);
             vfov = 20.0;
