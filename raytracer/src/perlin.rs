@@ -66,10 +66,35 @@ impl Perlin {
         let v = p.y() - p.y().floor();
         let w = p.z() - p.z().floor();
 
-        let i = p.x() as i32;
-        let j = p.y() as i32;
-        let k = p.z() as i32;
+        let i = p.x().floor() as i32;
+        let j = p.y().floor() as i32;
+        let k = p.z().floor() as i32;
 
-        self.ranfloat[self.perm_x[i] as usize ^ self.perm_y[j] as usize ^ self.perm_z[k] as usize]
+        let mut c = [[[0.0 ; 2]; 2]; 2];
+
+        for di in 0..2 {
+            for dj in 0..2 {
+                for dk in 0..2 {
+                    c[di as usize][dj as usize][dk as usize] = self.ranfloat[self.perm_x[(i + di) as usize & 255] as usize ^ self.perm_y[(j + dj) as usize & 255] as usize ^ self.perm_z[(k + dk) as usize & 255] as usize];
+                }
+            }
+        }
+
+        Perlin::trilinear_interp(c, u, v, w)
+    }
+
+    pub fn trilinear_interp(c: [[[f64; 2]; 2]; 2], u: f64, v: f64, w: f64) -> f64 {
+        let mut accum = 0.0;
+        for i in 0..2 {
+            for j in 0..2 {
+                for k in 0..2 {
+                    accum += (i as f64  * u + (1 - i) as f64 * (1.0 - u) as f64) *
+                    (j as f64 * v + (1 - j) as f64 * (1.0 - v) as f64) *
+                    (k as f64 * w + (1 - k) as f64 * (1.0 - w) as f64) * c[i][j][k];
+                }
+            }
+        }
+
+        accum
     }
 }

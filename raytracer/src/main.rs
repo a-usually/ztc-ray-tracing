@@ -172,7 +172,7 @@ fn two_sphere() -> HittableList {
 
 fn two_perlin_spheres() -> HittableList {
     let mut objects: HittableList = HittableList::new();
-    let pertext: Option<Arc<dyn Texture>> = Some(Arc::new(NoiseTexture::new_0()));
+    let pertext: Option<Arc<dyn Texture>> = Some(Arc::new(NoiseTexture::new_0(4.0)));
     objects.add(Some(Arc::new(Sphere::new(
         &Vec3::new(0.0, -1000.0, 0.0),
         1000.0,
@@ -197,12 +197,12 @@ fn main() {
     println!("CI: {}", is_ci);
 
     let aspect_ratio = 16.0 / 9.0;
-    let height = 225;
-    let width = 400;
+    let height = 800;
+    let width = 1200;
     let path = "output/test.jpg";
     let quality = 60; // From 0 to 100, suggested value: 60
-    let samples_per_pixel = 800;
-    let max_depth = 70;
+    let samples_per_pixel = 666;
+    let max_depth = 66;
 
     // Create image data
     let mut img: RgbImage = ImageBuffer::new(width.try_into().unwrap(), height.try_into().unwrap());
