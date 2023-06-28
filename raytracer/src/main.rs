@@ -197,8 +197,8 @@ fn main() {
     println!("CI: {}", is_ci);
 
     let aspect_ratio = 16.0 / 9.0;
-    let height = 225;
-    let width = 400;
+    let height = 800;
+    let width = 1200;
     let path = "output/test.jpg";
     let quality = 60; // From 0 to 100, suggested value: 60
     let samples_per_pixel = 800;
