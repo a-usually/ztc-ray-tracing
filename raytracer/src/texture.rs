@@ -2,7 +2,6 @@ pub use crate::color::clamp;
 pub use crate::perlin::Perlin;
 pub use crate::vec3::Vec3;
 
-
 use std::sync::Arc;
 pub trait Texture {
     fn value(&self, u: f64, v: f64, p: &Vec3) -> Vec3;
@@ -97,10 +96,10 @@ pub struct ImageTexture {
     bytes_per_scanline: i32,
 }
 
-impl  ImageTexture {
+impl ImageTexture {
     pub fn new_0() -> Self {
         Self {
-            data: vec![0 as u8; 0],
+            data: vec![0_u8; 0],
             width: 0,
             height: 0,
             bytes_per_scanline: 0,
@@ -110,19 +109,19 @@ impl  ImageTexture {
     pub fn new(filename: &str) -> Self {
         let photo = image::open(filename).unwrap();
 
-        Self { 
-            data: photo.clone().into_bytes(), 
-            width: photo.width() as i32, 
-            height: photo.height() as i32, 
-            bytes_per_scanline: (photo.width() * 3) as i32
+        Self {
+            data: photo.clone().into_bytes(),
+            width: photo.width() as i32,
+            height: photo.height() as i32,
+            bytes_per_scanline: (photo.width() * 3) as i32,
         }
     }
 }
 
 impl Texture for ImageTexture {
-    fn value(&self,mut u: f64,mut v: f64, _p: &Vec3) -> Vec3 {
-        if self.data == [0 as u8, 0] {
-            return Vec3::new(0.0, 1.0, 1.0)
+    fn value(&self, mut u: f64, mut v: f64, _p: &Vec3) -> Vec3 {
+        if self.data == [0_u8, 0] {
+            return Vec3::new(0.0, 1.0, 1.0);
         }
 
         u = clamp(u, 0.0, 1.0);
@@ -141,8 +140,12 @@ impl Texture for ImageTexture {
         let mut pixel: [f64; 3] = [0.0; 3];
         pixel[0] = self.data[(j * self.bytes_per_scanline + i * 3) as usize] as f64;
         pixel[1] = self.data[(j * self.bytes_per_scanline + i * 3 + 1) as usize] as f64;
-        pixel[2] = self.data[(j * self.bytes_per_scanline + i * 3 + 2) as usize] as  f64;
+        pixel[2] = self.data[(j * self.bytes_per_scanline + i * 3 + 2) as usize] as f64;
 
-        Vec3::new(color_scale * pixel[0], color_scale * pixel[1], color_scale * pixel[2])
+        Vec3::new(
+            color_scale * pixel[0],
+            color_scale * pixel[1],
+            color_scale * pixel[2],
+        )
     }
 }

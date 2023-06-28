@@ -28,7 +28,7 @@ pub use ray::Ray;
 pub use rtweekend::{degrees_to_radians, random_f64, random_f64_1};
 use std::fs::File;
 use std::sync::Arc;
-pub use texture::{CheckerTexture, NoiseTexture, Texture, ImageTexture};
+pub use texture::{CheckerTexture, ImageTexture, NoiseTexture, Texture};
 pub use vec3::Vec3;
 
 use crate::material::Dielectric;
@@ -190,11 +190,14 @@ fn two_perlin_spheres() -> HittableList {
 fn earth() -> HittableList {
     let earth_texture: Option<Arc<dyn Texture>> = Some(Arc::new(ImageTexture::new("earthmap.jpg")));
     let earth_surface: Option<Arc<dyn Material>> = Some(Arc::new(Lambertian::new2(&earth_texture)));
-    let globe: Option<Arc<dyn Hiitable>> = Some(Arc::new(Sphere::new(&Vec3::new(0.0, 0.0, 0.0), 2.0, earth_surface)));
+    let globe: Option<Arc<dyn Hiitable>> = Some(Arc::new(Sphere::new(
+        &Vec3::new(0.0, 0.0, 0.0),
+        2.0,
+        earth_surface,
+    )));
     let mut world_0: HittableList = HittableList::new();
     world_0.add(globe);
     world_0
-
 }
 fn is_ci() -> bool {
     option_env!("CI").unwrap_or_default() == "true"
@@ -211,8 +214,8 @@ fn main() {
     let width = 1200;
     let path = "output/test.jpg";
     let quality = 60; // From 0 to 100, suggested value: 60
-    let samples_per_pixel = 5;
-    let max_depth = 26;
+    let samples_per_pixel = 666;
+    let max_depth = 66;
 
     // Create image data
     let mut img: RgbImage = ImageBuffer::new(width.try_into().unwrap(), height.try_into().unwrap());
