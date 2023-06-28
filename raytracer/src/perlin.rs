@@ -70,12 +70,15 @@ impl Perlin {
         let j = p.y().floor() as i32;
         let k = p.z().floor() as i32;
 
-        let mut c = [[[0.0 ; 2]; 2]; 2];
+        let mut c = [[[0.0; 2]; 2]; 2];
 
         for di in 0..2 {
             for dj in 0..2 {
                 for dk in 0..2 {
-                    c[di as usize][dj as usize][dk as usize] = self.ranfloat[self.perm_x[(i + di) as usize & 255] as usize ^ self.perm_y[(j + dj) as usize & 255] as usize ^ self.perm_z[(k + dk) as usize & 255] as usize];
+                    c[di as usize][dj as usize][dk as usize] =
+                        self.ranfloat[self.perm_x[(i + di) as usize & 255] as usize
+                            ^ self.perm_y[(j + dj) as usize & 255] as usize
+                            ^ self.perm_z[(k + dk) as usize & 255] as usize];
                 }
             }
         }
@@ -85,12 +88,14 @@ impl Perlin {
 
     pub fn trilinear_interp(c: [[[f64; 2]; 2]; 2], u: f64, v: f64, w: f64) -> f64 {
         let mut accum = 0.0;
-        for i in 0..2 {
-            for j in 0..2 {
-                for k in 0..2 {
-                    accum += (i as f64  * u + (1 - i) as f64 * (1.0 - u) as f64) *
-                    (j as f64 * v + (1 - j) as f64 * (1.0 - v) as f64) *
-                    (k as f64 * w + (1 - k) as f64 * (1.0 - w) as f64) * c[i][j][k];
+        let vec_loop = [0, 1];
+        for i in vec_loop {
+            for j in vec_loop {
+                for k in vec_loop {
+                    accum += (i as f64 * u + (1 - i) as f64 * (1.0 - u))
+                        * (j as f64 * v + (1 - j) as f64 * (1.0 - v))
+                        * (k as f64 * w + (1 - k) as f64 * (1.0 - w))
+                        * c[i][j][k];
                 }
             }
         }
