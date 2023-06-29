@@ -17,7 +17,7 @@ pub trait Material {
         scattered: &mut Ray,
     ) -> bool;
 
-    fn emitted(&self, _u: f64,_v: f64, _p: &Vec3) -> Vec3;
+    fn emitted(&self, _u: f64, _v: f64, _p: &Vec3) -> Vec3;
 }
 
 pub struct Lambertian {
@@ -57,7 +57,7 @@ impl Material for Lambertian {
         true
     }
 
-    fn emitted(&self, _u: f64,_v: f64, _p: &Vec3) -> Vec3 {
+    fn emitted(&self, _u: f64, _v: f64, _p: &Vec3) -> Vec3 {
         Vec3::new(0.0, 0.0, 0.0)
     }
 }
@@ -101,7 +101,7 @@ impl Material for Metal {
         (scattered.direc() * rec.normal) > 0.0
     }
 
-    fn emitted(&self, _u: f64,_v: f64, _p: &Vec3) -> Vec3 {
+    fn emitted(&self, _u: f64, _v: f64, _p: &Vec3) -> Vec3 {
         Vec3::new(0.0, 0.0, 0.0)
     }
 }
@@ -163,7 +163,7 @@ impl Material for Dielectric {
         true
     }
 
-    fn emitted(&self, _u: f64,_v: f64, _p: &Vec3) -> Vec3 {
+    fn emitted(&self, _u: f64, _v: f64, _p: &Vec3) -> Vec3 {
         Vec3::new(0.0, 0.0, 0.0)
     }
 }
@@ -174,30 +174,28 @@ pub struct DiffLight {
 
 impl DiffLight {
     pub fn new1(a: Option<Arc<dyn Texture>>) -> Self {
-        Self {
-            emit: a,
-        }
+        Self { emit: a }
     }
 
     pub fn new2(c: Vec3) -> Self {
-        Self{
-            emit: Some(Arc::new(SolidColor::new(c)))
+        Self {
+            emit: Some(Arc::new(SolidColor::new(c))),
         }
     }
 }
 
 impl Material for DiffLight {
     fn scatter(
-            &self,
-            _r_in: &Ray,
-            _rec: &mut HitRecord,
-            _attenuation: &mut Vec3,
-            _scattered: &mut Ray,
-        ) -> bool {
+        &self,
+        _r_in: &Ray,
+        _rec: &mut HitRecord,
+        _attenuation: &mut Vec3,
+        _scattered: &mut Ray,
+    ) -> bool {
         false
     }
 
-    fn emitted(&self, u: f64,v: f64, p: &Vec3) -> Vec3 {
+    fn emitted(&self, u: f64, v: f64, p: &Vec3) -> Vec3 {
         self.emit.clone().unwrap().value(u, v, p)
     }
 }

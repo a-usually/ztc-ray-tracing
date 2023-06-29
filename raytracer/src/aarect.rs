@@ -1,6 +1,6 @@
+pub use crate::aabb::AAbb;
 pub use crate::hiitable::Hiitable;
 pub use crate::material::Material;
-pub use crate::aabb::AAbb;
 pub use crate::vec3::Vec3;
 
 use std::sync::Arc;
@@ -15,7 +15,14 @@ pub struct Xyrect {
 }
 
 impl Xyrect {
-    pub fn new(_x0: f64, _x1: f64, _y0: f64, _y1: f64, _k: f64, _mp: Option<Arc<dyn Material>>) -> Self {
+    pub fn new(
+        _x0: f64,
+        _x1: f64,
+        _y0: f64,
+        _y1: f64,
+        _k: f64,
+        _mp: Option<Arc<dyn Material>>,
+    ) -> Self {
         Self {
             mp: _mp,
             x0: _x0,
@@ -31,11 +38,20 @@ impl Hiitable for Xyrect {
     fn bounding_box(&self, _time0: f64, _time1: f64, output_box: &mut AAbb) -> bool {
         // The bounding box must have non-zero width in each dimension, so pad the Z
         // dimension a small amount.
-        *output_box = AAbb::new(Vec3::new(self.x0, self.y0, self.k - 0.0001), Vec3::new(self.x1, self.y1, self.k + 0.0001));
+        *output_box = AAbb::new(
+            Vec3::new(self.x0, self.y0, self.k - 0.0001),
+            Vec3::new(self.x1, self.y1, self.k + 0.0001),
+        );
         true
     }
 
-    fn hit(&self, r: &crate::Ray, t_min: f64, t_max: f64, rec: &mut crate::material::HitRecord) -> bool {
+    fn hit(
+        &self,
+        r: &crate::Ray,
+        t_min: f64,
+        t_max: f64,
+        rec: &mut crate::material::HitRecord,
+    ) -> bool {
         let t = (self.k - r.ori().z()) / r.direc().z();
         if t < t_min || t > t_max {
             return false;

@@ -1,4 +1,5 @@
 mod aabb;
+mod aarect;
 mod bvh;
 mod camera;
 mod color;
@@ -12,15 +13,15 @@ mod ray;
 mod rtweekend;
 mod texture;
 mod vec3;
-mod aarect;
 
+pub use crate::aarect::Xyrect;
 pub use camera::Camera;
 use color::write_color;
 pub use hiitable::Hiitable;
 pub use hittable_list::HittableList;
 use image::{ImageBuffer, RgbImage};
 use indicatif::ProgressBar;
-pub use material::{Lambertian, Material, Metal, Dielectric, DiffLight};
+pub use material::{Dielectric, DiffLight, Lambertian, Material, Metal};
 pub use moving_sphere::MovingSphere;
 use object::HitRecord;
 pub use object::Sphere;
@@ -31,7 +32,6 @@ use std::fs::File;
 use std::sync::Arc;
 pub use texture::{CheckerTexture, ImageTexture, NoiseTexture, Texture};
 pub use vec3::Vec3;
-pub use crate::aarect::Xyrect;
 
 const AUTHOR: &str = "Zhang Tongcheng";
 const INFINITY: f64 = f64::INFINITY;
@@ -44,7 +44,11 @@ fn ray_color(r: &Ray, background: &Vec3, world: &mut HittableList, depth: i32) -
     if !world.hit(r, 0.001, INFINITY, &mut rec) {
         return *background;
     }
-    let mut scattered = Ray::new(Vec3::new(0.0,0.0,0.0), Vec3::new(0.0, 0.0, 0.0), random_f64_1(0.0, 1.0));
+    let mut scattered = Ray::new(
+        Vec3::new(0.0, 0.0, 0.0),
+        Vec3::new(0.0, 0.0, 0.0),
+        random_f64_1(0.0, 1.0),
+    );
     let mut attenuation = Vec3::new(0.0, 0.0, 0.0);
     let emitter = rec.mat.clone().unwrap().emitted(rec.u, rec.v, &rec.point3);
     if !rec
@@ -56,7 +60,11 @@ fn ray_color(r: &Ray, background: &Vec3, world: &mut HittableList, depth: i32) -
         return emitter;
     }
     //println!("x:{}",attenuation.x());
-    emitter + Vec3::elemul(&attenuation, &ray_color(&scattered, background, &mut world.clone(), depth - 1))
+    emitter
+        + Vec3::elemul(
+            &attenuation,
+            &ray_color(&scattered, background, &mut world.clone(), depth - 1),
+        )
     // } else {
     //     let unit_direction = r.direc.unit();
     //     let t = 0.5 * (unit_direction.y() + 1.0);
@@ -203,12 +211,32 @@ fn earth() -> HittableList {
 fn simple_silght() -> HittableList {
     let mut objects: HittableList = HittableList::new();
     let pertext: Option<Arc<dyn Texture>> = Some(Arc::new(NoiseTexture::new_0(4.0)));
-    objects.add(Some(Arc::new(Sphere::new(&Vec3::new(0.0, -1000.0, 0.0), 1000.0, Some(Arc::new(Lambertian::new2(&pertext.clone())))))));
-    objects.add(Some(Arc::new(Sphere::new(&Vec3::new(0.0, 2.0, 0.0), 2.0, Some(Arc::new(Lambertian::new2(&pertext.clone())))))));
-    
-    let difflight: Option<Arc<dyn Material>> = Some(Arc::new(DiffLight::new2(Vec3::new(4.0, 4.0, 4.0))));
-    objects.add(Some(Arc::new(Xyrect::new(3.0, 5.0, 1.0, 3.0, -2.0, difflight.clone()))));
-    objects.add(Some(Arc::new(Sphere::new(&Vec3::new(0.0, 7.0, 0.0), 2.0, difflight.clone()))));
+    objects.add(Some(Arc::new(Sphere::new(
+        &Vec3::new(0.0, -1000.0, 0.0),
+        1000.0,
+        Some(Arc::new(Lambertian::new2(&pertext.clone()))),
+    ))));
+    objects.add(Some(Arc::new(Sphere::new(
+        &Vec3::new(0.0, 2.0, 0.0),
+        2.0,
+        Some(Arc::new(Lambertian::new2(&pertext.clone()))),
+    ))));
+
+    let difflight: Option<Arc<dyn Material>> =
+        Some(Arc::new(DiffLight::new2(Vec3::new(4.0, 4.0, 4.0))));
+    objects.add(Some(Arc::new(Xyrect::new(
+        3.0,
+        5.0,
+        1.0,
+        3.0,
+        -2.0,
+        difflight.clone(),
+    ))));
+    objects.add(Some(Arc::new(Sphere::new(
+        &Vec3::new(0.0, 7.0, 0.0),
+        2.0,
+        difflight.clone(),
+    ))));
 
     objects
 }
@@ -227,8 +255,8 @@ fn main() {
     let width = 1200;
     let path = "output/test.jpg";
     let quality = 60; // From 0 to 100, suggested value: 60
-    let samples_per_pixel = 5;
-    let max_depth = 20;
+    let samples_per_pixel = 600;
+    let max_depth = 50;
 
     // Create image data
     let mut img: RgbImage = ImageBuffer::new(width.try_into().unwrap(), height.try_into().unwrap());
@@ -266,7 +294,7 @@ fn main() {
     let lookfrom: Vec3;
     let lookat: Vec3;
     let mut vup = Vec3::new(0.0, 1.0, 0.0);
-    let mut background: Vec3;
+    let background: Vec3;
     let time_start = 0.0;
     let time_end = 1.0;
 
@@ -335,7 +363,7 @@ fn main() {
                 let u = ((i as f64) + random_f64()) / (width as f64 - 1.0);
                 let v = ((j as f64) + random_f64()) / (height as f64 - 1.0);
                 let r = cam.get_ray(u, v);
-                let tmp = ray_color(&r, &mut background, &mut world, max_depth); //[0-1]
+                let tmp = ray_color(&r, &background, &mut world, max_depth); //[0-1]
                 pixel_color.x += tmp.x;
                 pixel_color.y += tmp.y;
                 pixel_color.z += tmp.z;
