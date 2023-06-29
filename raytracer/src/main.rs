@@ -13,6 +13,7 @@ mod ray;
 mod rtweekend;
 mod texture;
 mod vec3;
+mod r#box;
 
 pub use crate::aarect::{Xyrect, Xzrect, Yzrect};
 pub use camera::Camera;
@@ -21,7 +22,7 @@ pub use hiitable::Hiitable;
 pub use hittable_list::HittableList;
 use image::{ImageBuffer, RgbImage};
 use indicatif::ProgressBar;
-pub use material::{Dielectric, DiffLight, Lambertian, Material, Metal};
+pub use material::{Dielectric, DiffLight, Lambertian, Material, Metal, Rotatey, Translate};
 pub use moving_sphere::MovingSphere;
 use object::HitRecord;
 pub use object::Sphere;
@@ -32,6 +33,7 @@ use std::fs::File;
 use std::sync::Arc;
 pub use texture::{CheckerTexture, ImageTexture, NoiseTexture, Texture};
 pub use vec3::Vec3;
+pub use r#box::Box;
 
 const AUTHOR: &str = "Zhang Tongcheng";
 const INFINITY: f64 = f64::INFINITY;
@@ -285,6 +287,19 @@ fn cornell_box() -> HittableList {
         555.0,
         white.clone(),
     ))));
+    objects.add(Some(Arc::new(Box::new(Vec3::new(130.0, 0.0, 65.0), Vec3::new(295.0, 165.0, 230.0), white.clone()))));
+    objects.add(Some(Arc::new(Box::new(Vec3::new(265.0, 0.0, 295.0), Vec3::new(430.0, 330.0, 460.0), white.clone()))));
+
+    let mut box1: Option<Arc<dyn Hiitable>> = Some(Arc::new(Box::new(Vec3::new(0.0, 0.0, 0.0), Vec3::new(165.0, 330.0, 165.0), white.clone())));
+    box1 = Some(Arc::new(Rotatey::new(box1, 15.0)));
+    box1 = Some(Arc::new(Translate::new(box1, Vec3::new(265.0, 0.0, 295.0))));
+    objects.add(box1);
+
+    let mut box2: Option<Arc<dyn Hiitable>> = Some(Arc::new(Box::new(Vec3::new(0.0, 0.0, 0.0), Vec3::new(165.0, 165.0, 165.0), white.clone())));
+    box2 = Some(Arc::new(Rotatey::new(box2, -18.0)));
+    box2 = Some(Arc::new(Translate::new(box2, Vec3::new(130.0, 0.0, 65.0))));
+    objects.add(box2);
+
     objects
 }
 
@@ -303,7 +318,7 @@ fn main() {
     let width = 900;
     let path = "output/test.jpg";
     let quality = 60; // From 0 to 100, suggested value: 60
-    let samples_per_pixel = 300;
+    let samples_per_pixel = 423;
     let max_depth = 50;
 
     // Create image data
