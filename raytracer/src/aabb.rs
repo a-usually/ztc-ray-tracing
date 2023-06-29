@@ -22,72 +22,69 @@ impl AAbb {
             maximum: b,
         }
     }
-    pub fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> bool {
-        for a in 0..3 {
-            if a == 0 {
-                let invd = 1.0 / r.direc().x();
-                let mut t0 = fmin(
-                    (self.mimimum.x() - r.ori.x()) / r.direc().x,
-                    (self.maximum.x() - r.ori().x()) * invd,
-                );
-                let mut t1 = fmax(
-                    (self.mimimum.x() - r.ori.x()) / r.direc().x,
-                    (self.maximum.x() - r.ori().x()) * invd,
-                );
+    pub fn hit(&self, r: &Ray,mut t_min: f64,mut t_max: f64) -> bool {
+                let mut invd = 1.0 / r.direc().x();
+                let mut t0 = (self.clone().mimimum.x() - r.ori().x()) * invd;
+                let mut t1 = (self.clone().maximum.x() - r.ori().x()) * invd;
 
                 if invd < 0.0 {
                     std::mem::swap(&mut t1, &mut t0);
                 }
 
-                let t_min_0 = fmax(t0, t_min);
-                let t_max_0 = fmin(t1, t_max);
-                if t_max_0 <= t_min_0 {
+                t_min = fmax(t0, t_min);
+                t_max = fmin(t1, t_max);
+
+                if t_max <= t_min {
                     return false;
                 }
-            } else if a == 1 {
-                let invd = 1.0 / r.direc().y();
-                let mut t0 = fmin(
-                    (self.mimimum.y() - r.ori.y()) / r.direc().y,
-                    (self.maximum.y() - r.ori().y()) * invd,
-                );
-                let mut t1 = fmax(
-                    (self.mimimum.y() - r.ori.y()) / r.direc().y,
-                    (self.maximum.y() - r.ori().y()) * invd,
-                );
+
+                invd = 1.0 / r.direc().y();
+                t0 = (self.clone().mimimum.y() - r.ori().y()) * invd;
+                t1 = (self.clone().maximum.y() - r.ori().y()) * invd;
 
                 if invd < 0.0 {
                     std::mem::swap(&mut t1, &mut t0);
                 }
 
-                let t_min_0 = fmax(t0, t_min);
-                let t_max_0 = fmin(t1, t_max);
-                if t_max_0 <= t_min_0 {
+                t_min = fmax(t0, t_min);
+                t_max = fmin(t1, t_max);
+
+                if t_max <= t_min {
                     return false;
                 }
-            } else {
-                let invd = 1.0 / r.direc().z();
-                let mut t0 = fmin(
-                    (self.mimimum.z() - r.ori.z()) / r.direc().z,
-                    (self.maximum.z() - r.ori().z()) * invd,
-                );
-                let mut t1 = fmax(
-                    (self.mimimum.z() - r.ori.z()) / r.direc().z,
-                    (self.maximum.z() - r.ori().z()) * invd,
-                );
+
+                invd = 1.0 / r.direc().z();
+                t0 = (self.clone().mimimum.z() - r.ori().z()) * invd;
+                t1 = (self.clone().maximum.z() - r.ori().z()) * invd;
 
                 if invd < 0.0 {
                     std::mem::swap(&mut t1, &mut t0);
                 }
 
-                let t_min_0 = fmax(t0, t_min);
-                let t_max_0 = fmin(t1, t_max);
-                if t_max_0 <= t_min_0 {
+                t_min = fmax(t0, t_min);
+                t_max = fmin(t1, t_max);
+
+                if t_max <= t_min {
                     return false;
                 }
-            }
+            true
         }
-        true
-    }
+    // pub fn hit(&self, r: &Ray, mut t_min: f64, mut t_max: f64) -> bool {
+    //     for a in 0..3 {
+    //         let inv_d = 1.0 / r.direc()[a];
+    //         let mut t0 = ((*self).min()[a] - r.ori()[a]) * inv_d;
+    //         let mut t1 = ((*self).max()[a] - r.ori()[a]) * inv_d;
+    //         if inv_d < 0.0 {
+    //             std::mem::swap(&mut t0, &mut t1);
+    //         }
+    //         t_min = t_min.max(t0);
+    //         t_max = t_max.min(t1);
+    //         if t_max <= t_min {
+    //             return false;
+    //         }
+    //     }
+    //     true
+    // }
 
     pub fn min(&self) -> Vec3 {
         self.mimimum
@@ -110,3 +107,4 @@ impl AAbb {
         AAbb::new(small, big)
     }
 }
+

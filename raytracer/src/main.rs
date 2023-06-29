@@ -404,7 +404,6 @@ fn final_scene() -> HittableList {
             boxes1.add(Some(Arc::new(Box::new(Vec3::new(x0, y0, z0), Vec3::new(x1, y1, z1), ground.clone()))));
         }
     }
-
     let mut objects: HittableList = HittableList::new();
     objects.add(Some(Arc::new(BvhNode::new2(&mut boxes1, 0.0, 1.0))));
 
@@ -433,7 +432,7 @@ fn final_scene() -> HittableList {
     let mut boxes2 = HittableList::new();
     let white:Option<Arc<dyn Material>> = Some(Arc::new(Lambertian::new1(&Vec3::new(0.73, 0.73, 0.73))));
     let ns = 1000;
-    for j in 0..ns {
+    for _j in 0..ns {
         boxes2.add(Some(Arc::new(Sphere::new(&Vec3::random_vec3_2(0.0, 165.0),10.0, white.clone()))));
     }
 

@@ -68,7 +68,6 @@ impl BvhNode {
         time0: f64,
         time1: f64,
     ) -> Self {
-        let objects = str_objects;
         let axis = random_i32_1(0, 2);
         let comparator = if axis == 0 {
             BvhNode::box_x_compare
@@ -82,28 +81,28 @@ impl BvhNode {
         let left_0: Option<Arc<dyn Hiitable>>;
         let right_0: Option<Arc<dyn Hiitable>>;
         if object_span == 1 {
-            left_0 = objects[start].clone();
-            right_0 = objects[start].clone();
+            left_0 = str_objects[start].clone();
+            right_0 = str_objects[start].clone();
         } else if object_span == 2 {
-            if comparator(&objects[start], &objects[start + 1]) == Less {
-                left_0 = objects[start].clone();
-                right_0 = objects[start + 1].clone();
+            if comparator(&str_objects[start], &str_objects[start + 1]) == Less {
+                left_0 = str_objects[start].clone();
+                right_0 = str_objects[start + 1].clone();
             } else {
-                left_0 = objects[start + 1].clone();
-                right_0 = objects[start].clone();
+                left_0 = str_objects[start + 1].clone();
+                right_0 = str_objects[start].clone();
             }
         } else {
-            objects.as_mut_slice()[start..end].sort_by(comparator);
+            str_objects.as_mut_slice()[start..end].sort_by(comparator);
             let mid = start + object_span / 2;
             left_0 = Some(Arc::new(BvhNode::new1(
-                objects,
+                str_objects,
                 start,
                 mid,
                 time0,
                 time1,
             )));
             right_0 = Some(Arc::new(BvhNode::new1(
-                objects,
+                str_objects,
                 mid,
                 end,
                 time0,
@@ -149,7 +148,7 @@ impl Hiitable for BvhNode {
             self.right
                 .clone()
                 .unwrap()
-                .hit(r, t_min, rec.clone().t, rec)
+                .hit(r, t_min, rec.t, rec)
         } else {
             self.right.clone().unwrap().hit(r, t_min, t_max, rec)
         };
@@ -162,3 +161,4 @@ impl Hiitable for BvhNode {
         true
     }
 }
+

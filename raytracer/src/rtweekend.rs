@@ -1,4 +1,4 @@
-pub use crate::bvh::AAbb;
+pub use crate::aabb::AAbb;
 pub use crate::vec3::Vec3;
 
 use rand::Rng;
