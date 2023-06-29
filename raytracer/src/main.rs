@@ -268,7 +268,7 @@ fn main() {
 
     println!("CI: {}", is_ci);
 
-    let aspect_ratio = 1.0 / 1.0;
+    let aspect_ratio = 1.0;
     let height = 900;
     let width = 900;
     let path = "output/test.jpg";
