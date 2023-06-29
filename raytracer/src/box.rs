@@ -1,10 +1,9 @@
-
-pub use crate::vec3::Vec3;
-pub use crate::hittable_list::HittableList;
 pub use crate::aabb::AAbb;
-pub use crate::material::Material;
-pub use crate::aarect::{Xyrect, Yzrect, Xzrect};
+pub use crate::aarect::{Xyrect, Xzrect, Yzrect};
 pub use crate::hiitable::Hiitable;
+pub use crate::hittable_list::HittableList;
+pub use crate::material::Material;
+pub use crate::vec3::Vec3;
 
 use std::sync::Arc;
 pub struct Box {
@@ -24,13 +23,54 @@ impl Box {
 
     pub fn new(p0: Vec3, p1: Vec3, ptr: Option<Arc<dyn Material>>) -> Self {
         let mut sides_0 = HittableList::new();
-        sides_0.add(Some(Arc::new(Xyrect::new(p0.x(), p1.x(), p0.y(), p1.y(), p1.z(), ptr.clone()))));
-        sides_0.add(Some(Arc::new(Xyrect::new(p0.x(), p1.x(), p0.y(), p1.y(), p0.z(), ptr.clone()))));
-        sides_0.add(Some(Arc::new(Xzrect::new(p0.x(), p1.x(), p0.z(), p1.z(), p1.y(), ptr.clone()))));
-        sides_0.add(Some(Arc::new(Xzrect::new(p0.x(), p1.x(), p0.z(), p1.z(), p0.y(), ptr.clone()))));
-        sides_0.add(Some(Arc::new(Yzrect::new(p0.y(), p1.y(), p0.z(), p1.z(), p1.x(), ptr.clone()))));
-        sides_0.add(Some(Arc::new(Yzrect::new(p0.y(), p1.y(), p0.z(), p1.z(), p0.x(), ptr.clone()))));
-
+        sides_0.add(Some(Arc::new(Xyrect::new(
+            p0.x(),
+            p1.x(),
+            p0.y(),
+            p1.y(),
+            p1.z(),
+            ptr.clone(),
+        ))));
+        sides_0.add(Some(Arc::new(Xyrect::new(
+            p0.x(),
+            p1.x(),
+            p0.y(),
+            p1.y(),
+            p0.z(),
+            ptr.clone(),
+        ))));
+        sides_0.add(Some(Arc::new(Xzrect::new(
+            p0.x(),
+            p1.x(),
+            p0.z(),
+            p1.z(),
+            p1.y(),
+            ptr.clone(),
+        ))));
+        sides_0.add(Some(Arc::new(Xzrect::new(
+            p0.x(),
+            p1.x(),
+            p0.z(),
+            p1.z(),
+            p0.y(),
+            ptr.clone(),
+        ))));
+        sides_0.add(Some(Arc::new(Yzrect::new(
+            p0.y(),
+            p1.y(),
+            p0.z(),
+            p1.z(),
+            p1.x(),
+            ptr.clone(),
+        ))));
+        sides_0.add(Some(Arc::new(Yzrect::new(
+            p0.y(),
+            p1.y(),
+            p0.z(),
+            p1.z(),
+            p0.x(),
+            ptr.clone(),
+        ))));
 
         Self {
             box_min: p0,
@@ -46,7 +86,13 @@ impl Hiitable for Box {
         true
     }
 
-    fn hit(&self, r: &crate::Ray, t_min: f64, t_max: f64, rec: &mut crate::material::HitRecord) -> bool {
+    fn hit(
+        &self,
+        r: &crate::Ray,
+        t_min: f64,
+        t_max: f64,
+        rec: &mut crate::material::HitRecord,
+    ) -> bool {
         self.sides.hit(r, t_min, t_max, rec)
     }
 }

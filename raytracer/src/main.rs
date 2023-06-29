@@ -1,5 +1,6 @@
 mod aabb;
 mod aarect;
+mod r#box;
 mod bvh;
 mod camera;
 mod color;
@@ -13,7 +14,6 @@ mod ray;
 mod rtweekend;
 mod texture;
 mod vec3;
-mod r#box;
 
 pub use crate::aarect::{Xyrect, Xzrect, Yzrect};
 pub use camera::Camera;
@@ -27,13 +27,13 @@ pub use moving_sphere::MovingSphere;
 use object::HitRecord;
 pub use object::Sphere;
 pub use perlin::Perlin;
+pub use r#box::Box;
 pub use ray::Ray;
 pub use rtweekend::{degrees_to_radians, random_f64, random_f64_1};
 use std::fs::File;
 use std::sync::Arc;
 pub use texture::{CheckerTexture, ImageTexture, NoiseTexture, Texture};
 pub use vec3::Vec3;
-pub use r#box::Box;
 
 const AUTHOR: &str = "Zhang Tongcheng";
 const INFINITY: f64 = f64::INFINITY;
@@ -287,15 +287,31 @@ fn cornell_box() -> HittableList {
         555.0,
         white.clone(),
     ))));
-    objects.add(Some(Arc::new(Box::new(Vec3::new(130.0, 0.0, 65.0), Vec3::new(295.0, 165.0, 230.0), white.clone()))));
-    objects.add(Some(Arc::new(Box::new(Vec3::new(265.0, 0.0, 295.0), Vec3::new(430.0, 330.0, 460.0), white.clone()))));
+    objects.add(Some(Arc::new(Box::new(
+        Vec3::new(130.0, 0.0, 65.0),
+        Vec3::new(295.0, 165.0, 230.0),
+        white.clone(),
+    ))));
+    objects.add(Some(Arc::new(Box::new(
+        Vec3::new(265.0, 0.0, 295.0),
+        Vec3::new(430.0, 330.0, 460.0),
+        white.clone(),
+    ))));
 
-    let mut box1: Option<Arc<dyn Hiitable>> = Some(Arc::new(Box::new(Vec3::new(0.0, 0.0, 0.0), Vec3::new(165.0, 330.0, 165.0), white.clone())));
+    let mut box1: Option<Arc<dyn Hiitable>> = Some(Arc::new(Box::new(
+        Vec3::new(0.0, 0.0, 0.0),
+        Vec3::new(165.0, 330.0, 165.0),
+        white.clone(),
+    )));
     box1 = Some(Arc::new(Rotatey::new(box1, 15.0)));
     box1 = Some(Arc::new(Translate::new(box1, Vec3::new(265.0, 0.0, 295.0))));
     objects.add(box1);
 
-    let mut box2: Option<Arc<dyn Hiitable>> = Some(Arc::new(Box::new(Vec3::new(0.0, 0.0, 0.0), Vec3::new(165.0, 165.0, 165.0), white.clone())));
+    let mut box2: Option<Arc<dyn Hiitable>> = Some(Arc::new(Box::new(
+        Vec3::new(0.0, 0.0, 0.0),
+        Vec3::new(165.0, 165.0, 165.0),
+        white.clone(),
+    )));
     box2 = Some(Arc::new(Rotatey::new(box2, -18.0)));
     box2 = Some(Arc::new(Translate::new(box2, Vec3::new(130.0, 0.0, 65.0))));
     objects.add(box2);

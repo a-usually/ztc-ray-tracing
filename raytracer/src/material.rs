@@ -1,14 +1,14 @@
+use crate::aabb::AAbb;
+pub use crate::hiitable::Hiitable;
 pub use crate::hiitable::HitRecord;
 pub use crate::moving_sphere::MovingSphere;
-use crate::aabb::AAbb;
 use crate::random_f64;
 pub use crate::ray::Ray;
-use crate::rtweekend::{fmin, fmax};
+pub use crate::rtweekend::degrees_to_radians;
+use crate::rtweekend::{fmax, fmin};
 pub use crate::texture::SolidColor;
 use crate::texture::Texture;
 pub use crate::vec3::Vec3;
-pub use crate::rtweekend::{degrees_to_radians};
-pub use crate::hiitable::Hiitable;
 
 const INFINITY: f64 = f64::INFINITY;
 
@@ -234,10 +234,18 @@ impl Hiitable for Translate {
     }
 
     fn bounding_box(&self, time0: f64, time1: f64, output_box: &mut AAbb) -> bool {
-        if !self.ptr.clone().unwrap().bounding_box(time0, time1, output_box) {
+        if !self
+            .ptr
+            .clone()
+            .unwrap()
+            .bounding_box(time0, time1, output_box)
+        {
             return false;
         }
-        *output_box = AAbb::new(output_box.min() + self.offset, output_box.max() + self.offset);
+        *output_box = AAbb::new(
+            output_box.min() + self.offset,
+            output_box.max() + self.offset,
+        );
         true
     }
 }
@@ -256,18 +264,20 @@ impl Rotatey {
         let radians = degrees_to_radians(angle);
         let sin_theta_0 = radians.sin();
         let cos_theta_0 = radians.cos();
-        let hashbox0 =p.clone().unwrap().bounding_box(0.0, 1.0, &mut bbox_0);
+        let hashbox0 = p.clone().unwrap().bounding_box(0.0, 1.0, &mut bbox_0);
 
         let mut min = Vec3::new(INFINITY, INFINITY, INFINITY);
         let mut max = Vec3::new(-INFINITY, -INFINITY, -INFINITY);
 
-
         for i in 0..2 {
             for j in 0..2 {
                 for k in 0..2 {
-                    let x = i as f64 * bbox_0.clone().max().x() + (1 - i) as f64 * bbox_0.clone().min().x();
-                    let y = j as f64 * bbox_0.clone().max().y() + (1 - j) as f64 * bbox_0.clone().min().y();
-                    let z = k as f64 * bbox_0.clone().max().z() + (1 - k) as f64 * bbox_0.clone().min().z();
+                    let x = i as f64 * bbox_0.clone().max().x()
+                        + (1 - i) as f64 * bbox_0.clone().min().x();
+                    let y = j as f64 * bbox_0.clone().max().y()
+                        + (1 - j) as f64 * bbox_0.clone().min().y();
+                    let z = k as f64 * bbox_0.clone().max().z()
+                        + (1 - k) as f64 * bbox_0.clone().min().z();
 
                     let newx = cos_theta_0 * x + sin_theta_0 * z;
                     let newz = -sin_theta_0 * x + cos_theta_0 * z;
@@ -277,7 +287,7 @@ impl Rotatey {
                     min.x = fmin(min.x(), taster.x());
                     min.y = fmin(min.y(), taster.y());
                     min.z = fmin(min.z(), taster.z());
-                    
+
                     max.x = fmax(max.x(), taster.x());
                     max.y = fmax(max.y(), taster.y());
                     max.z = fmax(max.z(), taster.z());
@@ -285,7 +295,7 @@ impl Rotatey {
             }
         }
         bbox_0 = AAbb::new(min, max);
-        Self { 
+        Self {
             ptr: p,
             sin_theta: sin_theta_0,
             cos_theta: cos_theta_0,
