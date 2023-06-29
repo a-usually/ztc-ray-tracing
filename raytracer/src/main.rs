@@ -18,7 +18,7 @@ mod vec3;
 pub use crate::aarect::{Xyrect, Xzrect, Yzrect};
 pub use camera::Camera;
 use color::write_color;
-pub use hiitable::{Rotatey, Hiitable};
+pub use hiitable::{Hiitable, Rotatey};
 pub use hittable_list::HittableList;
 use image::{ImageBuffer, RgbImage};
 use indicatif::ProgressBar;

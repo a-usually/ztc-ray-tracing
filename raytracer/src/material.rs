@@ -246,4 +246,3 @@ impl Hiitable for Translate {
         true
     }
 }
-

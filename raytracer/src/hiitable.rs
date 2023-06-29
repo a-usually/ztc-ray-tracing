@@ -1,8 +1,8 @@
 pub use crate::aabb::AAbb;
 pub use crate::material::Material;
 pub use crate::ray::Ray;
+pub use crate::rtweekend::{degrees_to_radians, fmax, fmin};
 pub use crate::vec3::Vec3;
-pub use crate::rtweekend::{fmin, fmax, degrees_to_radians};
 use std::sync::Arc;
 
 const INFINITY: f64 = f64::INFINITY;
@@ -45,6 +45,7 @@ impl HitRecord {
         }
     }
 }
+
 pub trait Hiitable {
     fn hit(&self, r: &Ray, t_min: f64, t_max: f64, rec: &mut HitRecord) -> bool;
 
