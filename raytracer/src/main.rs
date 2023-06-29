@@ -14,7 +14,7 @@ mod rtweekend;
 mod texture;
 mod vec3;
 
-pub use crate::aarect::Xyrect;
+pub use crate::aarect::{Xyrect, Yzrect, Xzrect};
 pub use camera::Camera;
 use color::write_color;
 pub use hiitable::Hiitable;
@@ -63,7 +63,7 @@ fn ray_color(r: &Ray, background: &Vec3, world: &mut HittableList, depth: i32) -
     emitter
         + Vec3::elemul(
             &attenuation,
-            &ray_color(&scattered, background, &mut world.clone(), depth - 1),
+            &ray_color(&scattered, background, world, depth - 1),
         )
     // } else {
     //     let unit_direction = r.direc.unit();
@@ -240,6 +240,24 @@ fn simple_silght() -> HittableList {
 
     objects
 }
+
+fn cornell_box() -> HittableList {
+    let mut objects: HittableList = HittableList::new();
+
+    let red: Option<Arc<dyn Material>> = Some(Arc::new(Lambertian::new1(&Vec3::new(0.65, 0.05, 0.05))));
+    let white: Option<Arc<dyn Material>> = Some(Arc::new(Lambertian::new1(&Vec3::new(0.73, 0.73, 0.73))));
+    let green: Option<Arc<dyn Material>> = Some(Arc::new(Lambertian::new1(&Vec3::new(0.12, 0.45, 0.15))));
+    let light: Option<Arc<dyn Material>> = Some(Arc::new(DiffLight::new2(Vec3::new(15.0, 15.0, 15.0))));
+
+    objects.add(Some(Arc::new(Yzrect::new(0.0, 555.0, 0.0, 555.0, 555.0, green))));
+    objects.add(Some(Arc::new(Yzrect::new(0.0, 555.0, 0.0, 555.0, 0.0, red))));
+    objects.add(Some(Arc::new(Xzrect::new(213.0, 343.0, 227.0, 332.0, 554.0, light))));
+    objects.add(Some(Arc::new(Xzrect::new(0.0, 555.0, 0.0, 555.0, 0.0, white.clone()))));
+    objects.add(Some(Arc::new(Xzrect::new(0.0, 555.0, 0.0, 555.0, 555.0, white.clone()))));
+    objects.add(Some(Arc::new(Xyrect::new(0.0, 555.0, 0.0, 555.0, 555.0, white.clone()))));
+
+    objects
+}
 fn is_ci() -> bool {
     option_env!("CI").unwrap_or_default() == "true"
 }
@@ -250,12 +268,12 @@ fn main() {
 
     println!("CI: {}", is_ci);
 
-    let aspect_ratio = 16.0 / 9.0;
-    let height = 800;
-    let width = 1200;
+    let aspect_ratio = 1.0 / 1.0;
+    let height = 900;
+    let width = 900;
     let path = "output/test.jpg";
     let quality = 60; // From 0 to 100, suggested value: 60
-    let samples_per_pixel = 600;
+    let samples_per_pixel = 300;
     let max_depth = 50;
 
     // Create image data
@@ -336,12 +354,19 @@ fn main() {
         //     vfov = 20.0;
         //     background = Vec3::new(0.0, 0.0, 0.0);
         // }
-        _ => {
+        5 => {
             world = simple_silght();
             background = Vec3::new(0.0, 0.0, 0.0);
             lookfrom = Vec3::new(26.0, 3.0, 6.0);
             lookat = Vec3::new(0.0, 2.0, 0.0);
             vfov = 20.0;
+        }
+        _ => {
+            world = cornell_box();
+            background = Vec3::new(0.0, 0.0, 0.0);
+            lookfrom = Vec3::new(278.0, 278.0, -800.0);
+            lookat = Vec3::new(278.0, 278.0, 0.0);
+            vfov = 40.0;
         }
     }
 
