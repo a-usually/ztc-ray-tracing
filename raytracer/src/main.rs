@@ -207,7 +207,8 @@ fn simple_silght() -> HittableList {
     objects.add(Some(Arc::new(Sphere::new(&Vec3::new(0.0, 2.0, 0.0), 2.0, Some(Arc::new(Lambertian::new2(&pertext.clone())))))));
     
     let difflight: Option<Arc<dyn Material>> = Some(Arc::new(DiffLight::new2(Vec3::new(4.0, 4.0, 4.0))));
-    objects.add(Some(Arc::new(Xyrect::new(3.0, 5.0, 1.0, 3.0, -2.0, difflight))));
+    objects.add(Some(Arc::new(Xyrect::new(3.0, 5.0, 1.0, 3.0, -2.0, difflight.clone()))));
+    objects.add(Some(Arc::new(Sphere::new(&Vec3::new(0.0, 7.0, 0.0), 2.0, difflight.clone()))));
 
     objects
 }
