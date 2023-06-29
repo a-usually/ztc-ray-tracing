@@ -18,11 +18,11 @@ mod vec3;
 pub use crate::aarect::{Xyrect, Xzrect, Yzrect};
 pub use camera::Camera;
 use color::write_color;
-pub use hiitable::Hiitable;
+pub use hiitable::{Rotatey, Hiitable};
 pub use hittable_list::HittableList;
 use image::{ImageBuffer, RgbImage};
 use indicatif::ProgressBar;
-pub use material::{Dielectric, DiffLight, Lambertian, Material, Metal, Rotatey, Translate};
+pub use material::{Dielectric, DiffLight, Lambertian, Material, Metal, Translate};
 pub use moving_sphere::MovingSphere;
 use object::HitRecord;
 pub use object::Sphere;
@@ -287,16 +287,6 @@ fn cornell_box() -> HittableList {
         555.0,
         white.clone(),
     ))));
-    objects.add(Some(Arc::new(Box::new(
-        Vec3::new(130.0, 0.0, 65.0),
-        Vec3::new(295.0, 165.0, 230.0),
-        white.clone(),
-    ))));
-    objects.add(Some(Arc::new(Box::new(
-        Vec3::new(265.0, 0.0, 295.0),
-        Vec3::new(430.0, 330.0, 460.0),
-        white.clone(),
-    ))));
 
     let mut box1: Option<Arc<dyn Hiitable>> = Some(Arc::new(Box::new(
         Vec3::new(0.0, 0.0, 0.0),
@@ -334,8 +324,8 @@ fn main() {
     let width = 900;
     let path = "output/test.jpg";
     let quality = 60; // From 0 to 100, suggested value: 60
-    let samples_per_pixel = 423;
-    let max_depth = 50;
+    let samples_per_pixel = 666;
+    let max_depth = 66;
 
     // Create image data
     let mut img: RgbImage = ImageBuffer::new(width.try_into().unwrap(), height.try_into().unwrap());
