@@ -90,7 +90,7 @@ impl Vec3 {
 
     pub fn random_in_hemisphere(normal: &Vec3) -> Vec3 {
         let in_unit_sphere = Vec3::random_in_unit_sphere();
-        if in_unit_sphere * normal.clone() > 0.0 {
+        if in_unit_sphere * *normal > 0.0 {
             in_unit_sphere
         } else {
             -in_unit_sphere
@@ -118,20 +118,20 @@ impl Vec3 {
     }
 
     pub fn reflect(v: &Vec3, n: &Vec3) -> Vec3 {
-        v.clone() - n.clone() * (v.clone() * n.clone()) * 2.0
+        *v - *n * (*v * *n) * 2.0
     }
 
     pub fn refract(uv: &Vec3, n: &Vec3, etai_over_etat: f64) -> Vec3 {
         let cos_theta: f64 = if ((-*uv) * *n) < 1.0 {
-            (-uv.clone()) * n.clone()
+            (-*uv) * *n
         } else {
             1.0
         };
-        let r_out_perp = (uv.clone() + n.clone() * cos_theta) * etai_over_etat;
+        let r_out_perp = (*uv + *n * cos_theta) * etai_over_etat;
         let r_out_parallel = if 1.0 > r_out_perp.squared_length() {
-            n.clone() * (-(1.0 - r_out_perp.squared_length()).sqrt())
+            *n * (-(1.0 - r_out_perp.squared_length()).sqrt())
         } else {
-            n.clone() * (-(r_out_perp.squared_length() - 1.0).sqrt())
+            *n * (-(r_out_perp.squared_length() - 1.0).sqrt())
         };
         r_out_perp + r_out_parallel
     }

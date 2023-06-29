@@ -27,7 +27,7 @@ pub struct Lambertian {
 impl Lambertian {
     pub fn new1(a: &Vec3) -> Self {
         Self {
-            albedo: Some(Arc::new(SolidColor::new(a.clone()))),
+            albedo: Some(Arc::new(SolidColor::new(*a))),
         }
     }
 
@@ -44,11 +44,11 @@ impl Material for Lambertian {
         attenuation: &mut Vec3,
         scattered: &mut Ray,
     ) -> bool {
-        let mut scatter_direction = rec.normal.clone() + Vec3::random_unit_vector();
+        let mut scatter_direction = rec.normal + Vec3::random_unit_vector();
         if scatter_direction.near_zero() {
-            scatter_direction = rec.normal.clone();
+            scatter_direction = rec.normal;
         }
-        *scattered = Ray::new(rec.point3.clone(), scatter_direction, _r_in.tm());
+        *scattered = Ray::new(rec.point3, scatter_direction, _r_in.tm());
         *attenuation = self
             .albedo
             .clone()
@@ -75,7 +75,7 @@ impl Metal {
             b = num;
         }
         Self {
-            albedo: a.clone(),
+            albedo: *a,
             fuzz: b,
         }
     }
@@ -92,13 +92,13 @@ impl Material for Metal {
         let reflected = Vec3::reflect(&r_in.direc().unit(), &rec.normal.clone());
 
         *scattered = Ray::new(
-            rec.point3.clone(),
+            rec.point3,
             reflected + Vec3::random_in_unit_sphere() * self.fuzz,
             r_in.tm,
         );
-        *attenuation = self.albedo.clone();
+        *attenuation = self.albedo;
 
-        (scattered.direc() * rec.normal.clone()) > 0.0
+        (scattered.direc() * rec.normal) > 0.0
     }
 
     fn emitted(&self, _u: f64,_v: f64, _p: &Vec3) -> Vec3 {
@@ -142,8 +142,8 @@ impl Material for Dielectric {
 
         let unit_direction = r_in.direc.unit();
 
-        let cos_theta: f64 = if ((-unit_direction.clone()) * rec.normal.clone()) < 1.0 {
-            (-unit_direction.clone()) * rec.normal.clone()
+        let cos_theta: f64 = if ((-unit_direction) * rec.normal) < 1.0 {
+            (-unit_direction) * rec.normal
         } else {
             1.0
         };
@@ -158,7 +158,7 @@ impl Material for Dielectric {
             Vec3::refract(&unit_direction, &rec.normal, refraction_ratio)
         };
 
-        *scattered = Ray::new(rec.point3.clone(), direction, r_in.tm);
+        *scattered = Ray::new(rec.point3, direction, r_in.tm);
 
         true
     }

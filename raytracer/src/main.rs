@@ -42,7 +42,7 @@ fn ray_color(r: &Ray, background: &Vec3, world: &mut HittableList, depth: i32) -
         return Vec3::new(0.0, 0.0, 0.0);
     }
     if !world.hit(r, 0.001, INFINITY, &mut rec) {
-        return background.clone();
+        return *background;
     }
     let mut scattered = Ray::new(Vec3::new(0.0,0.0,0.0), Vec3::new(0.0, 0.0, 0.0), random_f64_1(0.0, 1.0));
     let mut attenuation = Vec3::new(0.0, 0.0, 0.0);
@@ -56,7 +56,7 @@ fn ray_color(r: &Ray, background: &Vec3, world: &mut HittableList, depth: i32) -
         return emitter;
     }
     //println!("x:{}",attenuation.x());
-    emitter + Vec3::elemul(&attenuation, &ray_color(&scattered, &background, &mut world.clone(), depth - 1))
+    emitter + Vec3::elemul(&attenuation, &ray_color(&scattered, background, &mut world.clone(), depth - 1))
     // } else {
     //     let unit_direction = r.direc.unit();
     //     let t = 0.5 * (unit_direction.y() + 1.0);
