@@ -14,6 +14,7 @@ mod ray;
 mod rtweekend;
 mod texture;
 mod vec3;
+mod constant_medium;
 
 pub use crate::aarect::{Xyrect, Xzrect, Yzrect};
 pub use camera::Camera;
@@ -34,6 +35,7 @@ use std::fs::File;
 use std::sync::Arc;
 pub use texture::{CheckerTexture, ImageTexture, NoiseTexture, Texture};
 pub use vec3::Vec3;
+pub use constant_medium::ConstantMedium;
 
 const AUTHOR: &str = "Zhang Tongcheng";
 const INFINITY: f64 = f64::INFINITY;
@@ -319,6 +321,72 @@ fn cornell_box() -> HittableList {
     objects
 }
 
+fn cornell_smoke() -> HittableList {
+    let mut objects = HittableList::new();
+
+    let red: Option<Arc<dyn Material>> = Some(Arc::new(Lambertian::new1(&Vec3::new(0.65, 0.05, 0.05))));
+    let white: Option<Arc<dyn Material>> =
+    Some(Arc::new(Lambertian::new1(&Vec3::new(0.73, 0.73, 0.73))));
+let green: Option<Arc<dyn Material>> =
+    Some(Arc::new(Lambertian::new1(&Vec3::new(0.12, 0.45, 0.15))));
+let light: Option<Arc<dyn Material>> =
+    Some(Arc::new(DiffLight::new2(Vec3::new(7.0, 7.0, 7.0))));
+    objects.add(Some(Arc::new(Yzrect::new(
+        0.0, 555.0, 0.0, 555.0, 555.0, green,
+    ))));
+    objects.add(Some(Arc::new(Yzrect::new(
+        0.0, 555.0, 0.0, 555.0, 0.0, red,
+    ))));
+    objects.add(Some(Arc::new(Xzrect::new(
+        113.0, 443.0, 127.0, 432.0, 554.0, light,
+    ))));
+    objects.add(Some(Arc::new(Xzrect::new(
+        0.0,
+        555.0,
+        0.0,
+        555.0,
+        555.0,
+        white.clone(),
+    ))));
+    objects.add(Some(Arc::new(Xzrect::new(
+        0.0,
+        555.0,
+        0.0,
+        555.0,
+        0.0,
+        white.clone(),
+    ))));
+    objects.add(Some(Arc::new(Xyrect::new(
+        0.0,
+        555.0,
+        0.0,
+        555.0,
+        555.0,
+        white.clone(),
+    ))));
+
+    let mut box1: Option<Arc<dyn Hiitable>> = Some(Arc::new(Box::new(
+        Vec3::new(0.0, 0.0, 0.0),
+        Vec3::new(165.0, 330.0, 165.0),
+        white.clone(),
+    )));
+    box1 = Some(Arc::new(Rotatey::new(box1, 15.0)));
+    box1 = Some(Arc::new(Translate::new(box1, Vec3::new(265.0, 0.0, 295.0))));
+    objects.add(Some(Arc::new(ConstantMedium::new2(box1, 0.01, Vec3::new(0.0, 0.0, 0.0)))));
+
+    let mut box2: Option<Arc<dyn Hiitable>> = Some(Arc::new(Box::new(
+        Vec3::new(0.0, 0.0, 0.0),
+        Vec3::new(165.0, 165.0, 165.0),
+        white.clone(),
+    )));
+    box2 = Some(Arc::new(Rotatey::new(box2, -18.0)));
+    box2 = Some(Arc::new(Translate::new(box2, Vec3::new(130.0, 0.0, 65.0))));
+    objects.add(Some(Arc::new(ConstantMedium::new2(box2, 0.01, Vec3::new(1.0, 1.0, 1.0)))));
+
+    objects
+}
+    
+
 fn is_ci() -> bool {
     option_env!("CI").unwrap_or_default() == "true"
 }
@@ -334,8 +402,8 @@ fn main() {
     let width = 900;
     let path = "output/test.jpg";
     let quality = 60; // From 0 to 100, suggested value: 60
-    let samples_per_pixel = 423;
-    let max_depth = 50;
+    let samples_per_pixel = 4;
+    let max_depth = 20;
 
     // Create image data
     let mut img: RgbImage = ImageBuffer::new(width.try_into().unwrap(), height.try_into().unwrap());
@@ -422,8 +490,15 @@ fn main() {
             lookat = Vec3::new(0.0, 2.0, 0.0);
             vfov = 20.0;
         }
-        _ => {
+        6 => {
             world = cornell_box();
+            background = Vec3::new(0.0, 0.0, 0.0);
+            lookfrom = Vec3::new(278.0, 278.0, -800.0);
+            lookat = Vec3::new(278.0, 278.0, 0.0);
+            vfov = 40.0;
+        }
+        _ => {
+            world = cornell_smoke();
             background = Vec3::new(0.0, 0.0, 0.0);
             lookfrom = Vec3::new(278.0, 278.0, -800.0);
             lookat = Vec3::new(278.0, 278.0, 0.0);

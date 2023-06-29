@@ -341,3 +341,39 @@ impl Hiitable for Rotatey {
         self.hasbox
     }
 }
+
+pub struct Isotropic {
+    albedo: Option<Arc<dyn Texture>>,
+}
+
+impl Isotropic {
+    pub fn new1(c: Vec3) -> Self {
+        Self {
+            albedo: Some(Arc::new(SolidColor::new(c))),
+        }
+    }
+
+    pub fn new2(a: Option<Arc<dyn Texture>>) -> Self {
+        Self { 
+            albedo: a,
+        }
+    }
+}
+
+impl Material for Isotropic {
+    fn emitted(&self, _u: f64, _v: f64, _p: &Vec3) -> Vec3 {
+        Vec3::new(0.0, 0.0, 0.0)
+    }
+
+    fn scatter(
+            &self,
+            r_in: &Ray,
+            rec: &mut HitRecord,
+            attenuation: &mut Vec3,
+            scattered: &mut Ray,
+        ) -> bool {
+            *scattered = Ray::new(rec.point3, Vec3::random_in_unit_sphere(), r_in.tm());
+            *attenuation = self.albedo.clone().unwrap().value(rec.u, rec.v, &rec.point3);
+            true        
+    }
+}
