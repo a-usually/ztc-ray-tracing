@@ -6,7 +6,7 @@ use std::sync::Arc;
 
 #[derive(Clone)]
 pub struct HittableList {
-    objects: Vec<Option<Arc<dyn Hiitable>>>,
+    pub objects: Vec<Option<Arc<dyn Hiitable>>>,
 }
 
 impl Default for HittableList {

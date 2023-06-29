@@ -44,11 +44,11 @@ impl Hiitable for ConstantMedium {
         let mut rec1: HitRecord = HitRecord::new();
         let mut rec2: HitRecord = HitRecord::new();
 
-        if !self.boundary.clone().unwrap().hit(r, -INFINITY, INFINITY, &mut rec1.clone()) {
+        if !self.boundary.clone().unwrap().hit(r, -INFINITY, INFINITY, &mut rec1) {
             return false;
         }
 
-        if !self.boundary.clone().unwrap().hit(r, rec1.t + 0.0001, INFINITY, &mut rec2.clone()) {
+        if !self.boundary.clone().unwrap().hit(r, rec1.t + 0.0001, INFINITY, &mut rec2) {
             return false;
         }
 
@@ -73,14 +73,14 @@ impl Hiitable for ConstantMedium {
         }
 
         let ray_length = r.direc().length();
-        let distance_inside_boundary = (rec2.t -rec1.t) * ray_length;
+        let distance_inside_boundary = (rec2.t - rec1.t) * ray_length;
         let hit_distance = self.neg_inv_density * random_f64().ln();
 
         if hit_distance > distance_inside_boundary {
             return false;
         }
 
-        rec.t = rec1.t + hit_distance;
+        rec.t = rec1.t + hit_distance / ray_length;
         rec.point3 = r.at(rec.t);
 
         if debugging {
