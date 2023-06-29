@@ -1,4 +1,4 @@
-use crate::{rtweekend};
+
 pub use crate::vec3::Vec3;
 pub use crate::hittable_list::HittableList;
 pub use crate::aabb::AAbb;
@@ -41,7 +41,7 @@ impl Box {
 }
 
 impl Hiitable for Box {
-    fn bounding_box(&self, time0: f64, time1: f64, output_box: &mut AAbb) -> bool {
+    fn bounding_box(&self, _time0: f64, _time1: f64, output_box: &mut AAbb) -> bool {
         *output_box = AAbb::new(self.box_min, self.box_max);
         true
     }

@@ -326,7 +326,7 @@ impl Hiitable for Rotatey {
         true
     }
 
-    fn bounding_box(&self, time0: f64, time1: f64, output_box: &mut AAbb) -> bool {
+    fn bounding_box(&self, _time0: f64, _time1: f64, output_box: &mut AAbb) -> bool {
         *output_box = self.bbox.clone();
         self.hasbox
     }
