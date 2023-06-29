@@ -9,8 +9,6 @@ pub use crate::texture::SolidColor;
 use crate::texture::Texture;
 pub use crate::vec3::Vec3;
 
-const INFINITY: f64 = f64::INFINITY;
-
 use std::sync::Arc;
 
 pub trait Material {
