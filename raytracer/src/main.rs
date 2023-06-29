@@ -14,7 +14,7 @@ mod rtweekend;
 mod texture;
 mod vec3;
 
-pub use crate::aarect::{Xyrect, Yzrect, Xzrect};
+pub use crate::aarect::{Xyrect, Xzrect, Yzrect};
 pub use camera::Camera;
 use color::write_color;
 pub use hiitable::Hiitable;
@@ -237,27 +237,57 @@ fn simple_silght() -> HittableList {
         2.0,
         difflight.clone(),
     ))));
-
     objects
 }
 
 fn cornell_box() -> HittableList {
     let mut objects: HittableList = HittableList::new();
 
-    let red: Option<Arc<dyn Material>> = Some(Arc::new(Lambertian::new1(&Vec3::new(0.65, 0.05, 0.05))));
-    let white: Option<Arc<dyn Material>> = Some(Arc::new(Lambertian::new1(&Vec3::new(0.73, 0.73, 0.73))));
-    let green: Option<Arc<dyn Material>> = Some(Arc::new(Lambertian::new1(&Vec3::new(0.12, 0.45, 0.15))));
-    let light: Option<Arc<dyn Material>> = Some(Arc::new(DiffLight::new2(Vec3::new(15.0, 15.0, 15.0))));
+    let red: Option<Arc<dyn Material>> =
+        Some(Arc::new(Lambertian::new1(&Vec3::new(0.65, 0.05, 0.05))));
+    let white: Option<Arc<dyn Material>> =
+        Some(Arc::new(Lambertian::new1(&Vec3::new(0.73, 0.73, 0.73))));
+    let green: Option<Arc<dyn Material>> =
+        Some(Arc::new(Lambertian::new1(&Vec3::new(0.12, 0.45, 0.15))));
+    let light: Option<Arc<dyn Material>> =
+        Some(Arc::new(DiffLight::new2(Vec3::new(15.0, 15.0, 15.0))));
 
-    objects.add(Some(Arc::new(Yzrect::new(0.0, 555.0, 0.0, 555.0, 555.0, green))));
-    objects.add(Some(Arc::new(Yzrect::new(0.0, 555.0, 0.0, 555.0, 0.0, red))));
-    objects.add(Some(Arc::new(Xzrect::new(213.0, 343.0, 227.0, 332.0, 554.0, light))));
-    objects.add(Some(Arc::new(Xzrect::new(0.0, 555.0, 0.0, 555.0, 0.0, white.clone()))));
-    objects.add(Some(Arc::new(Xzrect::new(0.0, 555.0, 0.0, 555.0, 555.0, white.clone()))));
-    objects.add(Some(Arc::new(Xyrect::new(0.0, 555.0, 0.0, 555.0, 555.0, white.clone()))));
-
+    objects.add(Some(Arc::new(Yzrect::new(
+        0.0, 555.0, 0.0, 555.0, 555.0, green,
+    ))));
+    objects.add(Some(Arc::new(Yzrect::new(
+        0.0, 555.0, 0.0, 555.0, 0.0, red,
+    ))));
+    objects.add(Some(Arc::new(Xzrect::new(
+        213.0, 343.0, 227.0, 332.0, 554.0, light,
+    ))));
+    objects.add(Some(Arc::new(Xzrect::new(
+        0.0,
+        555.0,
+        0.0,
+        555.0,
+        0.0,
+        white.clone(),
+    ))));
+    objects.add(Some(Arc::new(Xzrect::new(
+        0.0,
+        555.0,
+        0.0,
+        555.0,
+        555.0,
+        white.clone(),
+    ))));
+    objects.add(Some(Arc::new(Xyrect::new(
+        0.0,
+        555.0,
+        0.0,
+        555.0,
+        555.0,
+        white.clone(),
+    ))));
     objects
 }
+
 fn is_ci() -> bool {
     option_env!("CI").unwrap_or_default() == "true"
 }

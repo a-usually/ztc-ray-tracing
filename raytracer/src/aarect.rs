@@ -176,7 +176,7 @@ impl Hiitable for Yzrect {
         // dimension a small amount.
         *output_box = AAbb::new(
             Vec3::new(self.k - 0.0001, self.y0, self.z0),
-            Vec3::new(self.k + 0.0001, self.y1, self.z1,),
+            Vec3::new(self.k + 0.0001, self.y1, self.z1),
         );
         true
     }
