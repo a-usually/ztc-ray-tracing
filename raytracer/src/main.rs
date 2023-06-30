@@ -87,7 +87,7 @@ fn ray_color(r: &Ray, background: &Vec3, world: &mut HittableList, depth: i32) -
 
 fn random_scene() -> HittableList {
     let mut world = HittableList::new();
-    let mut objects = HittableList::new();
+    //let mut objects = HittableList::new();
 
     let checker: Option<Arc<dyn Texture>> = Some(Arc::new(CheckerTexture::new_2(
         Vec3::new(0.2, 0.3, 0.1),
@@ -119,21 +119,21 @@ fn random_scene() -> HittableList {
             if (center - Vec3::new(4.0, 0.2, 0.0)).length() > 0.9 {
                 let sphere_material: Option<Arc<dyn Material>>;
                 if choose_mat < 0.8 {
-                    let albedo = Vec3::elemul(&Vec3::random_vec3_1(), &Vec3::random_vec3_1());
-                    sphere_material = Some(Arc::new(Lambertian::new1(&albedo)));
-                    world.add(Some(Arc::new(Sphere::new(&center, 0.2, sphere_material))));
-                    //difuse
                     // let albedo = Vec3::elemul(&Vec3::random_vec3_1(), &Vec3::random_vec3_1());
                     // sphere_material = Some(Arc::new(Lambertian::new1(&albedo)));
-                    // let center2 = center + Vec3::new(0.0, random_f64_1(0.0, 0.5), 0.0);
-                    // world.add(Some(Arc::new(MovingSphere::new(
-                    //     center,
-                    //     center2,
-                    //     0.0,
-                    //     1.0,
-                    //     0.2,
-                    //     sphere_material,
-                    // ))));
+                    // world.add(Some(Arc::new(Sphere::new(&center, 0.2, sphere_material))));
+                    //difuse
+                    let albedo = Vec3::elemul(&Vec3::random_vec3_1(), &Vec3::random_vec3_1());
+                    sphere_material = Some(Arc::new(Lambertian::new1(&albedo)));
+                    let center2 = center + Vec3::new(0.0, random_f64_1(0.0, 0.5), 0.0);
+                    world.add(Some(Arc::new(MovingSphere::new(
+                        center,
+                        center2,
+                        0.0,
+                        1.0,
+                        0.2,
+                        sphere_material,
+                    ))));
                 } else if choose_mat < 0.95 {
                     //metal
                     let albedo = Vec3::random_vec3_2(0.5, 1.0);
@@ -172,9 +172,9 @@ fn random_scene() -> HittableList {
         material3,
     ))));
 
-    objects.add(Some(Arc::new(BvhNode::new2(&mut world, 0.0, 1.0))));
+    //objects.add(Some(Arc::new(BvhNode::new2(&mut world, 0.0, 1.0))));
 
-    objects
+    world
 }
 
 fn two_sphere() -> HittableList {
