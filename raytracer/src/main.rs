@@ -87,7 +87,7 @@ fn ray_color(r: &Ray, background: &Vec3, world: &mut HittableList, depth: i32) -
 
 fn random_scene() -> HittableList {
     let mut world = HittableList::new();
-    //let mut objects = HittableList::new();
+    let mut objects = HittableList::new();
 
     let checker: Option<Arc<dyn Texture>> = Some(Arc::new(CheckerTexture::new_2(
         Vec3::new(0.2, 0.3, 0.1),
@@ -172,9 +172,9 @@ fn random_scene() -> HittableList {
         material3,
     ))));
 
-    //objects.add(Some(Arc::new(BvhNode::new2(&mut world, 0.0, 1.0))));
+    objects.add(Some(Arc::new(BvhNode::new2(&mut world, 0.0, 1.0))));
 
-    world
+    objects
 }
 
 fn two_sphere() -> HittableList {
