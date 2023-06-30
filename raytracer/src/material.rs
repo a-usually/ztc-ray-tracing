@@ -354,9 +354,7 @@ impl Isotropic {
     }
 
     pub fn new2(a: Option<Arc<dyn Texture>>) -> Self {
-        Self { 
-            albedo: a,
-        }
+        Self { albedo: a }
     }
 }
 
@@ -366,14 +364,18 @@ impl Material for Isotropic {
     }
 
     fn scatter(
-            &self,
-            r_in: &Ray,
-            rec: &mut HitRecord,
-            attenuation: &mut Vec3,
-            scattered: &mut Ray,
-        ) -> bool {
-            *scattered = Ray::new(rec.point3, Vec3::random_in_unit_sphere(), r_in.tm());
-            *attenuation = self.albedo.clone().unwrap().value(rec.u, rec.v, &rec.point3);
-            true        
+        &self,
+        r_in: &Ray,
+        rec: &mut HitRecord,
+        attenuation: &mut Vec3,
+        scattered: &mut Ray,
+    ) -> bool {
+        *scattered = Ray::new(rec.point3, Vec3::random_in_unit_sphere(), r_in.tm());
+        *attenuation = self
+            .albedo
+            .clone()
+            .unwrap()
+            .value(rec.u, rec.v, &rec.point3);
+        true
     }
 }

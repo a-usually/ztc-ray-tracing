@@ -22,53 +22,53 @@ impl AAbb {
             maximum: b,
         }
     }
-    pub fn hit(&self, r: &Ray,mut t_min: f64,mut t_max: f64) -> bool {
-                let mut invd = 1.0 / r.direc().x();
-                let mut t0 = (self.clone().mimimum.x() - r.ori().x()) * invd;
-                let mut t1 = (self.clone().maximum.x() - r.ori().x()) * invd;
+    pub fn hit(&self, r: &Ray, mut t_min: f64, mut t_max: f64) -> bool {
+        let mut invd = 1.0 / r.direc().x();
+        let mut t0 = (self.clone().mimimum.x() - r.ori().x()) * invd;
+        let mut t1 = (self.clone().maximum.x() - r.ori().x()) * invd;
 
-                if invd < 0.0 {
-                    std::mem::swap(&mut t1, &mut t0);
-                }
-
-                t_min = fmax(t0, t_min);
-                t_max = fmin(t1, t_max);
-
-                if t_max <= t_min {
-                    return false;
-                }
-
-                invd = 1.0 / r.direc().y();
-                t0 = (self.clone().mimimum.y() - r.ori().y()) * invd;
-                t1 = (self.clone().maximum.y() - r.ori().y()) * invd;
-
-                if invd < 0.0 {
-                    std::mem::swap(&mut t1, &mut t0);
-                }
-
-                t_min = fmax(t0, t_min);
-                t_max = fmin(t1, t_max);
-
-                if t_max <= t_min {
-                    return false;
-                }
-
-                invd = 1.0 / r.direc().z();
-                t0 = (self.clone().mimimum.z() - r.ori().z()) * invd;
-                t1 = (self.clone().maximum.z() - r.ori().z()) * invd;
-
-                if invd < 0.0 {
-                    std::mem::swap(&mut t1, &mut t0);
-                }
-
-                t_min = fmax(t0, t_min);
-                t_max = fmin(t1, t_max);
-
-                if t_max <= t_min {
-                    return false;
-                }
-            true
+        if invd < 0.0 {
+            std::mem::swap(&mut t1, &mut t0);
         }
+
+        t_min = fmax(t0, t_min);
+        t_max = fmin(t1, t_max);
+
+        if t_max <= t_min {
+            return false;
+        }
+
+        invd = 1.0 / r.direc().y();
+        t0 = (self.clone().mimimum.y() - r.ori().y()) * invd;
+        t1 = (self.clone().maximum.y() - r.ori().y()) * invd;
+
+        if invd < 0.0 {
+            std::mem::swap(&mut t1, &mut t0);
+        }
+
+        t_min = fmax(t0, t_min);
+        t_max = fmin(t1, t_max);
+
+        if t_max <= t_min {
+            return false;
+        }
+
+        invd = 1.0 / r.direc().z();
+        t0 = (self.clone().mimimum.z() - r.ori().z()) * invd;
+        t1 = (self.clone().maximum.z() - r.ori().z()) * invd;
+
+        if invd < 0.0 {
+            std::mem::swap(&mut t1, &mut t0);
+        }
+
+        t_min = fmax(t0, t_min);
+        t_max = fmin(t1, t_max);
+
+        if t_max <= t_min {
+            return false;
+        }
+        true
+    }
     // pub fn hit(&self, r: &Ray, mut t_min: f64, mut t_max: f64) -> bool {
     //     for a in 0..3 {
     //         let inv_d = 1.0 / r.direc()[a];
@@ -107,4 +107,3 @@ impl AAbb {
         AAbb::new(small, big)
     }
 }
-

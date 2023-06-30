@@ -101,13 +101,7 @@ impl BvhNode {
                 time0,
                 time1,
             )));
-            right_0 = Some(Arc::new(BvhNode::new1(
-                str_objects,
-                mid,
-                end,
-                time0,
-                time1,
-            )))
+            right_0 = Some(Arc::new(BvhNode::new1(str_objects, mid, end, time0, time1)))
         }
 
         let mut box_left = AAbb::new_0();
@@ -132,7 +126,7 @@ impl BvhNode {
         }
     }
 
-    pub fn new2( str_objects: &mut HittableList, time0: f64, time1: f64) -> Self {
+    pub fn new2(str_objects: &mut HittableList, time0: f64, time1: f64) -> Self {
         let l = str_objects.clone().objects.len();
         BvhNode::new1(&mut str_objects.objects, 0, l, time0, time1)
     }
@@ -145,10 +139,7 @@ impl Hiitable for BvhNode {
         }
         let hit_left = self.left.clone().unwrap().hit(r, t_min, t_max, rec);
         let hit_right = if hit_left {
-            self.right
-                .clone()
-                .unwrap()
-                .hit(r, t_min, rec.t, rec)
+            self.right.clone().unwrap().hit(r, t_min, rec.t, rec)
         } else {
             self.right.clone().unwrap().hit(r, t_min, t_max, rec)
         };
@@ -161,4 +152,3 @@ impl Hiitable for BvhNode {
         true
     }
 }
-

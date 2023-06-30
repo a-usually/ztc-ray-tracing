@@ -1,6 +1,6 @@
 pub use crate::hiitable::Hiitable;
 pub use crate::hittable_list::HitRecord;
-pub use crate::material::{Material, Isotropic};
+pub use crate::material::{Isotropic, Material};
 use crate::random_f64;
 pub use crate::texture::Texture;
 pub use crate::vec3::Vec3;
@@ -20,7 +20,7 @@ impl ConstantMedium {
         Self {
             boundary: b,
             neg_inv_density: -1.0 / d,
-            phase_function: Some(Arc::new(Isotropic::new2(a)))
+            phase_function: Some(Arc::new(Isotropic::new2(a))),
         }
     }
     pub fn new2(b: Option<Arc<dyn Hiitable>>, d: f64, c: Vec3) -> Self {
@@ -34,21 +34,40 @@ impl ConstantMedium {
 
 impl Hiitable for ConstantMedium {
     fn bounding_box(&self, time0: f64, time1: f64, output_box: &mut crate::r#box::AAbb) -> bool {
-        self.boundary.clone().unwrap().bounding_box(time0, time1, output_box)
+        self.boundary
+            .clone()
+            .unwrap()
+            .bounding_box(time0, time1, output_box)
     }
 
-    fn hit(&self, r: &crate::Ray, t_min: f64, t_max: f64, rec: &mut crate::material::HitRecord) -> bool {
+    fn hit(
+        &self,
+        r: &crate::Ray,
+        t_min: f64,
+        t_max: f64,
+        rec: &mut crate::material::HitRecord,
+    ) -> bool {
         let enabledebug = false;
         let debugging = enabledebug && random_f64() < 0.00001;
 
         let mut rec1: HitRecord = HitRecord::new();
         let mut rec2: HitRecord = HitRecord::new();
 
-        if !self.boundary.clone().unwrap().hit(r, -INFINITY, INFINITY, &mut rec1) {
+        if !self
+            .boundary
+            .clone()
+            .unwrap()
+            .hit(r, -INFINITY, INFINITY, &mut rec1)
+        {
             return false;
         }
 
-        if !self.boundary.clone().unwrap().hit(r, rec1.t + 0.0001, INFINITY, &mut rec2) {
+        if !self
+            .boundary
+            .clone()
+            .unwrap()
+            .hit(r, rec1.t + 0.0001, INFINITY, &mut rec2)
+        {
             return false;
         }
 
@@ -84,9 +103,14 @@ impl Hiitable for ConstantMedium {
         rec.point3 = r.at(rec.t);
 
         if debugging {
-            println!("hit_distance = {}\n",hit_distance);
-            println!("rec.t = {}\n",rec.t);
-            println!("rec.p.x = {},rec.p.y = {}. rec.p.z = {}.",rec.point3.x(),rec.point3.y(),rec.point3.z());
+            println!("hit_distance = {}\n", hit_distance);
+            println!("rec.t = {}\n", rec.t);
+            println!(
+                "rec.p.x = {},rec.p.y = {}. rec.p.z = {}.",
+                rec.point3.x(),
+                rec.point3.y(),
+                rec.point3.z()
+            );
         }
 
         rec.normal = Vec3::new(1.0, 0.0, 0.0);
