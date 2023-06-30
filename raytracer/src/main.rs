@@ -540,7 +540,7 @@ fn main() {
     let width = 1200;
     let path = "output/test.jpg";
     let quality = 60; // From 0 to 100, suggested value: 60
-    let samples_per_pixel = 4;
+    let samples_per_pixel = 300;
     let max_depth = 50;
 
     // Create image data
