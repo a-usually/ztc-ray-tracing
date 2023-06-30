@@ -87,6 +87,7 @@ fn ray_color(r: &Ray, background: &Vec3, world: &mut HittableList, depth: i32) -
 
 fn random_scene() -> HittableList {
     let mut world = HittableList::new();
+    let mut objects = HittableList::new();
 
     let checker: Option<Arc<dyn Texture>> = Some(Arc::new(CheckerTexture::new_2(
         Vec3::new(0.2, 0.3, 0.1),
@@ -159,6 +160,8 @@ fn random_scene() -> HittableList {
         1.0,
         material3,
     ))));
+    
+    //objects.add(Some(Arc::new(BvhNode::new2(&mut world, 0.0, 1.0))));
 
     world
 }
@@ -522,11 +525,11 @@ fn main() {
     println!("CI: {}", is_ci);
 
     let aspect_ratio = 1.0;
-    let height = 900;
-    let width = 900;
+    let height = 800;
+    let width = 1200;
     let path = "output/test.jpg";
     let quality = 60; // From 0 to 100, suggested value: 60
-    let samples_per_pixel = 2000;
+    let samples_per_pixel = 200;
     let max_depth = 50;
 
     // Create image data
@@ -569,7 +572,7 @@ fn main() {
     let time_start = 0.0;
     let time_end = 1.0;
 
-    match 0 {
+    match 1 {
         1 => {
             world = random_scene();
             background = Vec3::new(0.7, 0.8, 1.0);
