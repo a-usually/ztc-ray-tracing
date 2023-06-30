@@ -527,7 +527,7 @@ fn main() {
     let width = 900;
     let path = "output/test.jpg";
     let quality = 60; // From 0 to 100, suggested value: 60
-    let samples_per_pixel = 20;
+    let samples_per_pixel = 5000;
     let max_depth = 50;
 
     // Create image data
@@ -648,7 +648,7 @@ fn main() {
         (dist_to_focus, time_start, time_end),
     );
 
-    let job_times = 10;
+    let job_times = 50;
     let mut handles = vec![];
     //image
 
