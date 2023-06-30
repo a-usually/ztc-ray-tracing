@@ -14,7 +14,7 @@ const INFINITY: f64 = f64::INFINITY;
 
 use std::sync::Arc;
 
-pub trait Material {
+pub trait Material: Send + Sync {
     fn scatter(
         &self,
         r_in: &Ray,

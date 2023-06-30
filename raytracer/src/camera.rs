@@ -4,6 +4,7 @@ pub use ray::Ray;
 pub use rtweekend::degrees_to_radians;
 pub use vec3::Vec3;
 
+#[derive(Clone)]
 pub struct Camera {
     // aspect_ratio: f64,
     // vfov: f64,
