@@ -99,6 +99,14 @@ fn random_scene() -> HittableList {
         Some(Arc::new(Lambertian::new2(&checker))),
     ))));
 
+    // let ground_material: Option<Arc<dyn Material>> =
+    //     Some(Arc::new(Lambertian::new1(&Vec3::new(0.5, 0.5, 0.5))));
+    // world.add(Some(Arc::new(Sphere::new(
+    //     &Vec3::new(0.0, -1000.0, 0.0),
+    //     1000.0,
+    //     ground_material,
+    // ))));
+
     for a in -11..11 {
         for b in -11..11 {
             let choose_mat = random_f64();
@@ -111,18 +119,21 @@ fn random_scene() -> HittableList {
             if (center - Vec3::new(4.0, 0.2, 0.0)).length() > 0.9 {
                 let sphere_material: Option<Arc<dyn Material>>;
                 if choose_mat < 0.8 {
-                    //difuse
                     let albedo = Vec3::elemul(&Vec3::random_vec3_1(), &Vec3::random_vec3_1());
                     sphere_material = Some(Arc::new(Lambertian::new1(&albedo)));
-                    let center2 = center + Vec3::new(0.0, random_f64_1(0.0, 0.5), 0.0);
-                    world.add(Some(Arc::new(MovingSphere::new(
-                        center,
-                        center2,
-                        0.0,
-                        1.0,
-                        0.2,
-                        sphere_material,
-                    ))));
+                    world.add(Some(Arc::new(Sphere::new(&center, 0.2, sphere_material))));
+                    //difuse
+                    // let albedo = Vec3::elemul(&Vec3::random_vec3_1(), &Vec3::random_vec3_1());
+                    // sphere_material = Some(Arc::new(Lambertian::new1(&albedo)));
+                    // let center2 = center + Vec3::new(0.0, random_f64_1(0.0, 0.5), 0.0);
+                    // world.add(Some(Arc::new(MovingSphere::new(
+                    //     center,
+                    //     center2,
+                    //     0.0,
+                    //     1.0,
+                    //     0.2,
+                    //     sphere_material,
+                    // ))));
                 } else if choose_mat < 0.95 {
                     //metal
                     let albedo = Vec3::random_vec3_2(0.5, 1.0);
@@ -524,12 +535,12 @@ fn main() {
 
     println!("CI: {}", is_ci);
 
-    let aspect_ratio = 1.0;
+    let aspect_ratio = 16.0 / 9.0;
     let height = 800;
     let width = 1200;
     let path = "output/test.jpg";
     let quality = 60; // From 0 to 100, suggested value: 60
-    let samples_per_pixel = 200;
+    let samples_per_pixel = 4;
     let max_depth = 50;
 
     // Create image data
