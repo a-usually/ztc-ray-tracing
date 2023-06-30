@@ -23,7 +23,7 @@ use color::write_color;
 pub use constant_medium::ConstantMedium;
 pub use hiitable::Hiitable;
 pub use hittable_list::HittableList;
-use image::{ImageBuffer};
+use image::ImageBuffer;
 use indicatif::ProgressBar;
 pub use material::{Dielectric, DiffLight, Lambertian, Material, Metal, Rotatey, Translate};
 pub use moving_sphere::MovingSphere;
@@ -34,8 +34,8 @@ pub use r#box::Box;
 pub use ray::Ray;
 pub use rtweekend::{degrees_to_radians, random_f64, random_f64_1};
 use std::fs::File;
-use std::thread;
 use std::sync::{Arc, Mutex};
+use std::thread;
 pub use texture::{CheckerTexture, ImageTexture, NoiseTexture, Texture};
 pub use vec3::Vec3;
 
@@ -531,7 +531,10 @@ fn main() {
     let max_depth = 50;
 
     // Create image data
-    let img = Arc::new(Mutex::new(ImageBuffer::new(width.try_into().unwrap(), height.try_into().unwrap())));
+    let img = Arc::new(Mutex::new(ImageBuffer::new(
+        width.try_into().unwrap(),
+        height.try_into().unwrap(),
+    )));
 
     // World
     // let mut world: HittableList = HittableList::new();
@@ -629,13 +632,12 @@ fn main() {
             lookfrom = Vec3::new(478.0, 278.0, -600.0);
             lookat = Vec3::new(278.0, 278.0, 0.0);
             vfov = 40.0;
-        }
-        // _ => {
-        //     lookfrom = Vec3::new(0.0, 0.0, 0.0);
-        //     lookat = Vec3::new(0.0, 0.0, 0.0);
-        //     vfov = 20.0;
-        //     background = Vec3::new(0.0, 0.0, 0.0);
-        // }
+        } // _ => {
+          //     lookfrom = Vec3::new(0.0, 0.0, 0.0);
+          //     lookat = Vec3::new(0.0, 0.0, 0.0);
+          //     vfov = 20.0;
+          //     background = Vec3::new(0.0, 0.0, 0.0);
+          // }
     }
 
     let cam: Camera = Camera::new(
@@ -671,11 +673,17 @@ fn main() {
                         pixel_color.x += tmp.x;
                         pixel_color.y += tmp.y;
                         pixel_color.z += tmp.z;
-        
+
                         //ray_1.info();
                     }
                     //pixel_color.info();
-                    write_color(&pixel_color, &mut img_0.lock().unwrap(), i, height - j - 1, samples_per_pixel); //[0-255*sample]
+                    write_color(
+                        &pixel_color,
+                        &mut img_0.lock().unwrap(),
+                        i,
+                        height - j - 1,
+                        samples_per_pixel,
+                    ); //[0-255*sample]
                     bar_0.inc(1);
                 }
             }
@@ -692,7 +700,8 @@ fn main() {
 
     // Output image to file
     println!("Ouput image as \"{}\"\n Author: {}", path, AUTHOR);
-    let output_image = image::DynamicImage::ImageRgb8(Mutex::into_inner(Arc::into_inner(img).unwrap()).unwrap());
+    let output_image =
+        image::DynamicImage::ImageRgb8(Mutex::into_inner(Arc::into_inner(img).unwrap()).unwrap());
     let mut output_file = File::create(path).unwrap();
     match output_image.write_to(&mut output_file, image::ImageOutputFormat::Jpeg(quality)) {
         Ok(_) => {}
